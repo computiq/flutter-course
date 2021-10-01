@@ -1,6 +1,4 @@
-# contacts_01
-
-A new Flutter project.
+# Flutter Course Code
 
 ## Getting Started
 
