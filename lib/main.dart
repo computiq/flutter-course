@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'dart:math' as math;
 void main() {
   runApp(const MyApp());
 }
@@ -40,6 +40,135 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  int _selectedIndex = 2;
+  static const TextStyle optionStyle =
+  TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
+  static late List<Widget> _pages;
+
+  _MyHomePageState() {
+    _pages = [
+      buildContactsList(),
+      buildFavoritesGridView(),
+      // Text('hello'),
+      Text(
+        'Index 2: School',
+        style: optionStyle,
+      ),
+    ];
+  }
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  var contacts = [
+    Contact(
+      'https://i.pravatar.cc/300',
+      'Ahmed',
+      '71766137347',
+      DateTime.now().add(
+        const Duration(seconds: 3),
+      ),
+      true,
+    ),
+    Contact(
+      'https://i.pravatar.cc/301',
+      'Ali',
+      '71766137347',
+      DateTime.now().add(
+        const Duration(days: 1),
+      ),
+      false,
+    ),
+    Contact(
+      'https://i.pravatar.cc/302',
+      'Kamal',
+      '71766137347',
+      DateTime.now().add(
+        const Duration(days: 3),
+      ),
+      true,
+    ),
+    Contact(
+      'https://i.pravatar.cc/303',
+      'Mohammad',
+      '71766137347',
+      DateTime.now().add(
+        const Duration(days: 5),
+      ),
+      true,
+    ),
+    Contact(
+      'https://i.pravatar.cc/304',
+      'Mohammad',
+      '71766137347',
+      DateTime.now().add(
+        const Duration(days: 5),
+      ),
+      false,
+    ),
+    Contact(
+      'https://i.pravatar.cc/305',
+      'Hussein',
+      '71766137347',
+      DateTime.now().add(
+        const Duration(days: 6),
+      ),
+      false,
+    ),
+    Contact(
+      'https://i.pravatar.cc/306',
+      'Aboud',
+      '71766137347',
+      DateTime.now().add(
+        const Duration(days: 7),
+      ),
+      false,
+    ),
+    Contact(
+      'https://i.pravatar.cc/307',
+      'Osama',
+      '71766137347',
+      DateTime.now().add(
+        const Duration(days: 6),
+      ),
+      false,
+    ),
+  ];
+
+  Widget buildFavoritesGridView() {
+    return Column(
+      children: [
+        Text('Favorites'),
+        Divider(thickness: 4,),
+        Expanded(
+          child: GridView.count(
+            crossAxisCount: 3,
+            children: List.generate(5, (index) {
+              var personColor = Color((math.Random().nextDouble() * 0xFFFFFF).toInt())
+                  .withOpacity(1.0);
+              return Center(
+                child: Container(
+                  width: 120,
+                  height: 120,
+                  child: Text(
+                    contacts[index].name[0],
+                    style: TextStyle(fontSize: 40),
+                  ),
+                  alignment: Alignment.center,
+                  decoration:
+                  BoxDecoration(shape: BoxShape.circle, color: personColor),
+                ),
+              );
+            }),
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget buildContactItem(Contact _contact) {
     return Card(
       child: Padding(
@@ -83,154 +212,43 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget buildIGCard() {
-    var imageUrl = 'https://images.pexels.com/photos/1544947/pexels-photo-1544947.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=500';
-
-    return Container(
-      // color: Color(0xff162f5a),
-      decoration: BoxDecoration(
-          border: Border.all(color: Colors.white, width: 6),
-        color:  Color(0xff162f5a)
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Image.network(
-            imageUrl,
-            height: 300,
-            width: double.maxFinite,
-            fit: BoxFit.cover,
-          ),
-          Row(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Icon(
-                  Icons.favorite_outline,
-                  color: Colors.white,
-                  size: 45,
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Icon(
-                  Icons.location_on_outlined,
-                  color: Colors.white,
-                  size: 45,
-                ),
-              ),
-              Expanded(
-                child: Container(),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Icon(
-                  Icons.more_vert,
-                  color: Colors.white,
-                  size: 45,
-                ),
-              ),
-            ],
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text('25 Likes', style: TextStyle(
-              color: Colors.white, fontSize: 30,
-              fontWeight: FontWeight.w800
-            ),),
-          ),
-        ],
-      ),
+  Widget buildContactsList() {
+    return ListView.builder(
+      itemBuilder: (_context, index) {
+        return buildContactItem(contacts[index]);
+      },
+      itemCount: contacts.length,
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    var contacts = [
-      Contact(
-        'https://i.pravatar.cc/300',
-        'Ahmed',
-        '71766137347',
-        DateTime.now().add(
-          const Duration(seconds: 3),
-        ),
-        true,
-      ),
-      Contact(
-        'https://i.pravatar.cc/301',
-        'Ali',
-        '71766137347',
-        DateTime.now().add(
-          const Duration(days: 1),
-        ),
-        false,
-      ),
-      Contact(
-        'https://i.pravatar.cc/302',
-        'Kamal',
-        '71766137347',
-        DateTime.now().add(
-          const Duration(days: 3),
-        ),
-        true,
-      ),
-      Contact(
-        'https://i.pravatar.cc/303',
-        'Mohammad',
-        '71766137347',
-        DateTime.now().add(
-          const Duration(days: 5),
-        ),
-        true,
-      ),
-      Contact(
-        'https://i.pravatar.cc/304',
-        'Mohammad',
-        '71766137347',
-        DateTime.now().add(
-          const Duration(days: 5),
-        ),
-        false,
-      ),
-      Contact(
-        'https://i.pravatar.cc/305',
-        'Hussein',
-        '71766137347',
-        DateTime.now().add(
-          const Duration(days: 6),
-        ),
-        false,
-      ),
-      Contact(
-        'https://i.pravatar.cc/306',
-        'Aboud',
-        '71766137347',
-        DateTime.now().add(
-          const Duration(days: 7),
-        ),
-        false,
-      ),
-      Contact(
-        'https://i.pravatar.cc/307',
-        'Osama',
-        '71766137347',
-        DateTime.now().add(
-          const Duration(days: 6),
-        ),
-        false,
-      ),
-    ];
-
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: ListView.builder(
-        itemBuilder: (_context, index) {
-          return buildContactItem(contacts[index]);
-        },
-        itemCount: contacts.length,
+      body: Center(
+        child: _pages[_selectedIndex],
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Recent',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.favorite),
+            label: 'Favorites',
+          ),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.access_time_outlined),
+              label: 'School',
+              activeIcon: Icon(Icons.access_time_filled)
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        selectedItemColor: Colors.amber[800],
+        onTap: _onItemTapped,
       ),
     );
   }
