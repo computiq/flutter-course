@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
+
 void main() {
   runApp(const MyApp());
 }
 
-class Contact {
+class Posts {
   String image;
-  String name;
-  String mobileNumber;
-  DateTime date;
-  bool isIncoming;
-
-  Contact(this.image, this.name, this.mobileNumber, this.date, this.isIncoming);
+  String likes;
+  Posts(this.image, this.likes);
 }
 
 class MyApp extends StatelessWidget {
@@ -20,12 +17,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo 2',
+      title: 'bottom Navigation',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
       debugShowCheckedModeBanner: false,
-      home: const MyHomePage(title: 'Contacts App'),
+      home: const MyHomePage(title: 'App'),
     );
   }
 }
@@ -39,19 +36,20 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
+//////////////////////////
+
 class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 2;
   static const TextStyle optionStyle =
-  TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
+      TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
   static late List<Widget> _pages;
 
   _MyHomePageState() {
     _pages = [
-      buildContactsList(),
-      buildFavoritesGridView(),
-      // Text('hello'),
-      Text(
-        'Index 2: School',
+      buildListView(),
+      buildGridView(),
+      const Text(
+        'Other',
         style: optionStyle,
       ),
     ];
@@ -63,161 +61,82 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  var contacts = [
-    Contact(
-      'https://i.pravatar.cc/300',
-      'Ahmed',
-      '71766137347',
-      DateTime.now().add(
-        const Duration(seconds: 3),
-      ),
-      true,
-    ),
-    Contact(
-      'https://i.pravatar.cc/301',
-      'Ali',
-      '71766137347',
-      DateTime.now().add(
-        const Duration(days: 1),
-      ),
-      false,
-    ),
-    Contact(
-      'https://i.pravatar.cc/302',
-      'Kamal',
-      '71766137347',
-      DateTime.now().add(
-        const Duration(days: 3),
-      ),
-      true,
-    ),
-    Contact(
-      'https://i.pravatar.cc/303',
-      'Mohammad',
-      '71766137347',
-      DateTime.now().add(
-        const Duration(days: 5),
-      ),
-      true,
-    ),
-    Contact(
-      'https://i.pravatar.cc/304',
-      'Mohammad',
-      '71766137347',
-      DateTime.now().add(
-        const Duration(days: 5),
-      ),
-      false,
-    ),
-    Contact(
-      'https://i.pravatar.cc/305',
-      'Hussein',
-      '71766137347',
-      DateTime.now().add(
-        const Duration(days: 6),
-      ),
-      false,
-    ),
-    Contact(
-      'https://i.pravatar.cc/306',
-      'Aboud',
-      '71766137347',
-      DateTime.now().add(
-        const Duration(days: 7),
-      ),
-      false,
-    ),
-    Contact(
-      'https://i.pravatar.cc/307',
-      'Osama',
-      '71766137347',
-      DateTime.now().add(
-        const Duration(days: 6),
-      ),
-      false,
-    ),
+  var posts = [
+    Posts('https://i.pravatar.cc/300', '22'),
+    Posts('https://i.pravatar.cc/350', '232'),
+    Posts('https://i.pravatar.cc/302', '322'),
+    Posts('https://i.pravatar.cc/360', '223'),
+    Posts('https://i.pravatar.cc/300', '23'),
+    Posts('https://i.pravatar.cc/390', '324'),
+    Posts('https://i.pravatar.cc/300', '23'),
+    Posts('https://i.pravatar.cc/3340', '324'),
+    Posts('https://i.pravatar.cc/3340', '23'),
+    Posts('https://i.pravatar.cc/3490', '324'),
   ];
 
-  Widget buildFavoritesGridView() {
-    return Column(
-      children: [
-        Text('Favorites'),
-        Divider(thickness: 4,),
-        Expanded(
-          child: GridView.count(
-            crossAxisCount: 3,
-            children: List.generate(5, (index) {
-              var personColor = Color((math.Random().nextDouble() * 0xFFFFFF).toInt())
-                  .withOpacity(1.0);
-              return Center(
-                child: Container(
-                  width: 120,
-                  height: 120,
-                  child: Text(
-                    contacts[index].name[0],
-                    style: TextStyle(fontSize: 40),
-                  ),
-                  alignment: Alignment.center,
-                  decoration:
-                  BoxDecoration(shape: BoxShape.circle, color: personColor),
-                ),
-              );
-            }),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget buildContactItem(Contact _contact) {
+  var grids = [
+    Posts('https://i.pravatar.cc/300', '22'),
+    Posts('https://i.pravatar.cc/350', '232'),
+    Posts('https://i.pravatar.cc/302', '322'),
+    Posts('https://i.pravatar.cc/360', '223'),
+    Posts('https://i.pravatar.cc/300', '23'),
+    Posts('https://i.pravatar.cc/390', '324'),
+    Posts('https://i.pravatar.cc/340', '23'),
+    Posts('https://i.pravatar.cc/390', '324'),
+    Posts('https://i.pravatar.cc/500', '23'),
+    Posts('https://i.pravatar.cc/660', '324'),
+  ];
+//////////////////////////////////////////////////////////listView
+  Widget getLists(Posts _contact) {
     return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Row(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15.0),
+        ),
+        color: Colors.blue[300],
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            CircleAvatar(
-              backgroundImage: NetworkImage(_contact.image),
+            Padding(
+              padding: EdgeInsets.all(5.0),
+              child: Image.network(_contact.image),
             ),
             Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    _contact.name,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  Text(_contact.mobileNumber),
-                ],
+                padding: EdgeInsets.all(5.0),
+                child: Row(children: [
+                  const Icon(Icons.favorite_outlined),
+                  const Icon(Icons.edit_location_alt_outlined),
+                  Expanded(child: Container()),
+                  const Icon(Icons.more_vert_outlined),
+                ])),
+            Padding(
+              padding: const EdgeInsets.all(5.0),
+              child: Row(
+                children: [const Text('Likes: '), Text(_contact.likes)],
               ),
             ),
-            Text(_contact.date.toIso8601String().split('T').first),
-            Expanded(
-              child: Container(),
-            ),
-            if (_contact.isIncoming)
-              Icon(
-                Icons.arrow_downward,
-                color: Colors.red,
-              )
-            else
-              Icon(
-                Icons.arrow_upward,
-                color: Colors.green,
-              )
           ],
-        ),
-      ),
+        ));
+  }
+
+  Widget buildListView() {
+    return ListView.builder(
+      itemBuilder: (_context, index) {
+        return getLists(posts[index]);
+      },
+      itemCount: posts.length,
     );
   }
 
-  Widget buildContactsList() {
-    return ListView.builder(
-      itemBuilder: (_context, index) {
-        return buildContactItem(contacts[index]);
+  //////////////////////////////////////////////////////////GridView
+
+  Widget buildGridView() {
+    return GridView.builder(
+      itemCount: grids.length,
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2, crossAxisSpacing: 4.0, mainAxisSpacing: 4.0),
+      itemBuilder: (BuildContext context, int index) {
+        return CircleAvatar(backgroundImage: NetworkImage(grids[index].image));
       },
-      itemCount: contacts.length,
     );
   }
 
@@ -233,18 +152,17 @@ class _MyHomePageState extends State<MyHomePage> {
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Recent',
+            icon: Icon(Icons.list),
+            label: 'ListView',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.favorite),
-            label: 'Favorites',
+            icon: Icon(Icons.grid_3x3),
+            label: 'GridView',
           ),
           BottomNavigationBarItem(
               icon: Icon(Icons.access_time_outlined),
-              label: 'School',
-              activeIcon: Icon(Icons.access_time_filled)
-          ),
+              label: 'Other',
+              activeIcon: Icon(Icons.access_time_filled)),
         ],
         currentIndex: _selectedIndex,
         selectedItemColor: Colors.amber[800],
