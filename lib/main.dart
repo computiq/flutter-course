@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'dart:math' as math;
+
 void main() {
-  runApp(const MyApp());
+  runApp(const HomePage());
 }
 
 class Contact {
@@ -10,246 +10,227 @@ class Contact {
   String mobileNumber;
   DateTime date;
   bool isIncoming;
-
   Contact(this.image, this.name, this.mobileNumber, this.date, this.isIncoming);
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+var contacts = [
+  Contact(
+    'https://i.pravatar.cc/300',
+    'Ahmed',
+    '71766137347',
+    DateTime.now().add(
+      const Duration(seconds: 3),
+    ),
+    true,
+  ),
+  Contact(
+    'https://i.pravatar.cc/301',
+    'Ali',
+    '71766137347',
+    DateTime.now().add(
+      const Duration(days: 1),
+    ),
+    false,
+  ),
+  Contact(
+    'https://i.pravatar.cc/302',
+    'Kamal',
+    '71766137347',
+    DateTime.now().add(
+      const Duration(days: 3),
+    ),
+    true,
+  ),
+  Contact(
+    'https://i.pravatar.cc/303',
+    'Mohammad',
+    '71766137347',
+    DateTime.now().add(
+      const Duration(days: 5),
+    ),
+    true,
+  ),
+  Contact(
+    'https://i.pravatar.cc/304',
+    'Mohammad',
+    '71766137347',
+    DateTime.now().add(
+      const Duration(days: 5),
+    ),
+    false,
+  ),
+  Contact(
+    'https://i.pravatar.cc/305',
+    'Hussein',
+    '71766137347',
+    DateTime.now().add(
+      const Duration(days: 6),
+    ),
+    false,
+  ),
+  Contact(
+    'https://i.pravatar.cc/306',
+    'Aboud',
+    '71766137347',
+    DateTime.now().add(
+      const Duration(days: 7),
+    ),
+    false,
+  ),
+  Contact(
+    'https://i.pravatar.cc/307',
+    'Osama',
+    '71766137347',
+    DateTime.now().add(
+      const Duration(days: 6),
+    ),
+    false,
+  ),
+];
 
+class HomePage extends StatefulWidget {
+  const HomePage({Key? key}) : super(key: key);
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  int index = 0;
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo 2',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      debugShowCheckedModeBanner: false,
-      home: const MyHomePage(title: 'Contacts App'),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _selectedIndex = 2;
-  static const TextStyle optionStyle =
-  TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
-  static late List<Widget> _pages;
-
-  _MyHomePageState() {
-    _pages = [
-      buildContactsList(),
-      buildFavoritesGridView(),
-      // Text('hello'),
-      Text(
-        'Index 2: School',
-        style: optionStyle,
-      ),
-    ];
-  }
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
-  var contacts = [
-    Contact(
-      'https://i.pravatar.cc/300',
-      'Ahmed',
-      '71766137347',
-      DateTime.now().add(
-        const Duration(seconds: 3),
-      ),
-      true,
-    ),
-    Contact(
-      'https://i.pravatar.cc/301',
-      'Ali',
-      '71766137347',
-      DateTime.now().add(
-        const Duration(days: 1),
-      ),
-      false,
-    ),
-    Contact(
-      'https://i.pravatar.cc/302',
-      'Kamal',
-      '71766137347',
-      DateTime.now().add(
-        const Duration(days: 3),
-      ),
-      true,
-    ),
-    Contact(
-      'https://i.pravatar.cc/303',
-      'Mohammad',
-      '71766137347',
-      DateTime.now().add(
-        const Duration(days: 5),
-      ),
-      true,
-    ),
-    Contact(
-      'https://i.pravatar.cc/304',
-      'Mohammad',
-      '71766137347',
-      DateTime.now().add(
-        const Duration(days: 5),
-      ),
-      false,
-    ),
-    Contact(
-      'https://i.pravatar.cc/305',
-      'Hussein',
-      '71766137347',
-      DateTime.now().add(
-        const Duration(days: 6),
-      ),
-      false,
-    ),
-    Contact(
-      'https://i.pravatar.cc/306',
-      'Aboud',
-      '71766137347',
-      DateTime.now().add(
-        const Duration(days: 7),
-      ),
-      false,
-    ),
-    Contact(
-      'https://i.pravatar.cc/307',
-      'Osama',
-      '71766137347',
-      DateTime.now().add(
-        const Duration(days: 6),
-      ),
-      false,
-    ),
-  ];
-
-  Widget buildFavoritesGridView() {
-    return Column(
-      children: [
-        Text('Favorites'),
-        Divider(thickness: 4,),
-        Expanded(
-          child: GridView.count(
-            crossAxisCount: 3,
-            children: List.generate(5, (index) {
-              var personColor = Color((math.Random().nextDouble() * 0xFFFFFF).toInt())
-                  .withOpacity(1.0);
-              return Center(
-                child: Container(
-                  width: 120,
-                  height: 120,
-                  child: Text(
-                    contacts[index].name[0],
-                    style: TextStyle(fontSize: 40),
-                  ),
-                  alignment: Alignment.center,
-                  decoration:
-                  BoxDecoration(shape: BoxShape.circle, color: personColor),
-                ),
-              );
-            }),
-          ),
+      home: Scaffold(
+        appBar: AppBar(
+          title: const Text("asdasd"),
+          centerTitle: true,
         ),
-      ],
-    );
-  }
-
-  Widget buildContactItem(Contact _contact) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Row(
-          children: [
-            CircleAvatar(
-              backgroundImage: NetworkImage(_contact.image),
+        body: Container(
+          child: index == 0
+              ? const Text("Home")
+              : index == 1
+                  ? const ContactListPage()
+                  : const Text("School"),
+        ),
+        bottomNavigationBar: BottomNavigationBar(
+          currentIndex: index,
+          onTap: (i) => setState(() {
+            index = i;
+          }),
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              label: 'Home',
             ),
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    _contact.name,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  Text(_contact.mobileNumber),
-                ],
-              ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.contact_phone),
+              label: 'Contact',
             ),
-            Text(_contact.date.toIso8601String().split('T').first),
-            Expanded(
-              child: Container(),
-            ),
-            if (_contact.isIncoming)
-              Icon(
-                Icons.arrow_downward,
-                color: Colors.red,
-              )
-            else
-              Icon(
-                Icons.arrow_upward,
-                color: Colors.green,
-              )
+            BottomNavigationBarItem(
+                icon: Icon(Icons.access_time_outlined),
+                label: 'School',
+                activeIcon: Icon(Icons.access_time_filled)),
           ],
         ),
       ),
     );
   }
+}
 
-  Widget buildContactsList() {
-    return ListView.builder(
-      itemBuilder: (_context, index) {
-        return buildContactItem(contacts[index]);
-      },
-      itemCount: contacts.length,
-    );
-  }
+// Widget ContactListPage() {
+//   return Card();
+// }
+
+class ContactListPage extends StatefulWidget {
+  const ContactListPage({Key? key}) : super(key: key);
 
   @override
+  _ContactListPageState createState() => _ContactListPageState();
+}
+
+class _ContactListPageState extends State<ContactListPage> {
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: _pages[_selectedIndex],
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Recent',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.favorite),
-            label: 'Favorites',
-          ),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.access_time_outlined),
-              label: 'School',
-              activeIcon: Icon(Icons.access_time_filled)
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: Colors.amber[800],
-        onTap: _onItemTapped,
-      ),
+    List<Widget> _Conatct = [];
+    contacts.forEach((e) => {
+          print(e.name),
+          _Conatct.add(Contacts(
+              name: e.name,
+              imgURL: e.image,
+              number: e.mobileNumber,
+              date: e.date,
+              isComing: e.isIncoming))
+        });
+    return ListView(
+      children: _Conatct,
     );
   }
+}
+
+Widget Contacts(
+    {String name = "",
+    String imgURL = "",
+    String number = "",
+    bool isComing = false,
+    DateTime? date}) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      SizedBox(
+        height: 75.0,
+        child: Card(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ClipRRect(
+                    borderRadius: BorderRadius.circular(100),
+                    child: Image.network(
+                      imgURL,
+                      width: 50,
+                      fit: BoxFit.cover,
+                    )),
+              ),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    name,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(number),
+                ],
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 30),
+                child:
+                    Text(date!.toIso8601String().split('T').first.toString()),
+              ),
+              Expanded(
+                  child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    isComing
+                        ? const Icon(
+                            Icons.arrow_upward,
+                            color: Colors.green,
+                          )
+                        : const Icon(
+                            Icons.arrow_downward,
+                            color: Colors.red,
+                          )
+                  ],
+                ),
+              ))
+            ],
+          ),
+        ),
+      ),
+    ],
+  );
 }
