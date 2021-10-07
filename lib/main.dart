@@ -40,6 +40,22 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+
+  int _selectedIndex = 0;
+
+  //for every button taped to navigate
+  void navigate(int index){
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  //pages
+  var pages = [
+    BHomePage(),
+    Center(child: Container(alignment: Alignment.center, child: Text('Settings page test'), ),),
+  ] ;
+
   Widget buildContactItem(Contact _contact) {
     return Card(
       child: Padding(
@@ -232,6 +248,38 @@ class _MyHomePageState extends State<MyHomePage> {
         },
         itemCount: contacts.length,
       ),
+        bottomNavigationBar: BottomNavigationBar(
+          currentIndex: _selectedIndex,
+          onTap: navigate,
+          backgroundColor: Colors.white,
+          items: [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              label: 'Home',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.business),
+              label: 'Business',
+            ),
+
+
+          ],
+        ),
     );
   }
 }
+
+class BHomePage extends StatefulWidget {
+  const BHomePage({Key? key}) : super(key: key);
+
+  @override
+  _BHomePageState createState() => _BHomePageState();
+}
+
+class _BHomePageState extends State<BHomePage> {
+  @override
+  Widget build(BuildContext context) {
+    return   Center(child: Container(alignment: Alignment.center, child: build(context), ),);
+  }
+}
+
