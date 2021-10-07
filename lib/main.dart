@@ -51,7 +51,7 @@ class _MyHomePageState extends State<MyHomePage> {
       buildFavoritesGridView(),
       // Text('hello'),
       Text(
-        'Index 2: School',
+        'Index 2: Time',
         style: optionStyle,
       ),
     ];
@@ -66,8 +66,8 @@ class _MyHomePageState extends State<MyHomePage> {
   var contacts = [
     Contact(
       'https://i.pravatar.cc/300',
-      'Ahmed',
-      '71766137347',
+      'Esraa',
+      '077xxxxxxxx',
       DateTime.now().add(
         const Duration(seconds: 3),
       ),
@@ -75,44 +75,44 @@ class _MyHomePageState extends State<MyHomePage> {
     ),
     Contact(
       'https://i.pravatar.cc/301',
-      'Ali',
-      '71766137347',
+      'Sara',
+      '077xxxxxxxx',
       DateTime.now().add(
-        const Duration(days: 1),
+        const Duration(seconds: 5),
       ),
       false,
     ),
     Contact(
       'https://i.pravatar.cc/302',
-      'Kamal',
-      '71766137347',
+      'Ali',
+      '077xxxxxxxx',
       DateTime.now().add(
-        const Duration(days: 3),
+        const Duration(minutes: 7),
       ),
       true,
     ),
     Contact(
       'https://i.pravatar.cc/303',
-      'Mohammad',
-      '71766137347',
+      'Zainab',
+      '077xxxxxxxx',
       DateTime.now().add(
-        const Duration(days: 5),
+        const Duration(days: 1),
       ),
       true,
     ),
     Contact(
       'https://i.pravatar.cc/304',
-      'Mohammad',
-      '71766137347',
+      'Osama',
+      '077xxxxxxxx',
       DateTime.now().add(
-        const Duration(days: 5),
+        const Duration(days: 3),
       ),
       false,
     ),
     Contact(
       'https://i.pravatar.cc/305',
-      'Hussein',
-      '71766137347',
+      'Dena',
+      '077xxxxxxxx',
       DateTime.now().add(
         const Duration(days: 6),
       ),
@@ -120,19 +120,19 @@ class _MyHomePageState extends State<MyHomePage> {
     ),
     Contact(
       'https://i.pravatar.cc/306',
-      'Aboud',
-      '71766137347',
+      'Mohammed',
+      '077xxxxxxxx',
       DateTime.now().add(
         const Duration(days: 7),
       ),
       false,
     ),
     Contact(
-      'https://i.pravatar.cc/307',
-      'Osama',
-      '71766137347',
+      'https://i.pravatar.cc/302',
+      'Mom',
+      '077xxxxxxxx',
       DateTime.now().add(
-        const Duration(days: 6),
+        const Duration(days: 8),
       ),
       false,
     ),
@@ -242,12 +242,12 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           BottomNavigationBarItem(
               icon: Icon(Icons.access_time_outlined),
-              label: 'School',
+              label: 'Time',
               activeIcon: Icon(Icons.access_time_filled)
           ),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: Colors.amber[800],
+        selectedItemColor: Colors.black,
         onTap: _onItemTapped,
       ),
     );
