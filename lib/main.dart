@@ -369,7 +369,7 @@ Widget Post(name, location, like) {
             ),
           ),
           SizedBox(
-            width: 600,
+            width: 500,
           ),
           Padding(
             padding: const EdgeInsets.only(top: 3.0, right: 2.0),
@@ -496,7 +496,7 @@ Widget Post1(name, location, like) {
             ),
           ),
           SizedBox(
-            width: 600,
+            width: 500,
           ),
           Padding(
             padding: const EdgeInsets.only(top: 3.0, right: 2.0),
@@ -624,7 +624,7 @@ Widget Post3(name, location, like) {
             ),
           ),
           SizedBox(
-            width: 600,
+            width: 500,
           ),
           Padding(
             padding: const EdgeInsets.only(top: 3.0, right: 2.0),
@@ -751,7 +751,7 @@ Widget Post4(name, location, like) {
             ),
           ),
           SizedBox(
-            width: 600,
+            width: 500,
           ),
           Padding(
             padding: const EdgeInsets.only(top: 3.0, right: 2.0),
@@ -878,7 +878,7 @@ Widget Post5(name, location, like) {
             ),
           ),
           SizedBox(
-            width: 600,
+            width: 500,
           ),
           Padding(
             padding: const EdgeInsets.only(top: 3.0, right: 2.0),
@@ -1004,7 +1004,7 @@ Widget Post6(name, location, like) {
             ),
           ),
           SizedBox(
-            width: 600,
+            width: 500,
           ),
           Padding(
             padding: const EdgeInsets.only(top: 3.0, right: 2.0),
@@ -1131,7 +1131,7 @@ Widget Post7(name, location, like) {
             ),
           ),
           SizedBox(
-            width: 600,
+            width: 500,
           ),
           Padding(
             padding: const EdgeInsets.only(top: 3.0, right: 2.0),
@@ -1258,7 +1258,7 @@ Widget Post8(name, location, like) {
             ),
           ),
           SizedBox(
-            width: 600,
+            width: 500,
           ),
           Padding(
             padding: const EdgeInsets.only(top: 3.0, right: 2.0),
