@@ -29,14 +29,14 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  final tabs = [
+    const RecentListView(),
+    const FavoriteListView(),
+    const ContactListView(),
+  ];
+  int _curentIndex = 0;
   @override
   Widget build(BuildContext context) {
-    final tabs = [
-      const RecentListView(),
-      const FavoriteListView(),
-      const ContactListView(),
-    ];
-    int _curentIndex = 0;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Contacts'),
