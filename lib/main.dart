@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
+
 void main() {
   runApp(const MyApp());
 }
@@ -42,7 +43,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 2;
   static const TextStyle optionStyle =
-  TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
+      TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
   static late List<Widget> _pages;
 
   _MyHomePageState() {
@@ -142,13 +143,16 @@ class _MyHomePageState extends State<MyHomePage> {
     return Column(
       children: [
         Text('Favorites'),
-        Divider(thickness: 4,),
+        Divider(
+          thickness: 4,
+        ),
         Expanded(
           child: GridView.count(
             crossAxisCount: 3,
             children: List.generate(5, (index) {
-              var personColor = Color((math.Random().nextDouble() * 0xFFFFFF).toInt())
-                  .withOpacity(1.0);
+              var personColor =
+                  Color((math.Random().nextDouble() * 0xFFFFFF).toInt())
+                      .withOpacity(1.0);
               return Center(
                 child: Container(
                   width: 120,
@@ -159,7 +163,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                   alignment: Alignment.center,
                   decoration:
-                  BoxDecoration(shape: BoxShape.circle, color: personColor),
+                      BoxDecoration(shape: BoxShape.circle, color: personColor),
                 ),
               );
             }),
@@ -243,8 +247,7 @@ class _MyHomePageState extends State<MyHomePage> {
           BottomNavigationBarItem(
               icon: Icon(Icons.access_time_outlined),
               label: 'School',
-              activeIcon: Icon(Icons.access_time_filled)
-          ),
+              activeIcon: Icon(Icons.access_time_filled)),
         ],
         currentIndex: _selectedIndex,
         selectedItemColor: Colors.amber[800],
