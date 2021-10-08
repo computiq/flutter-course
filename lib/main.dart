@@ -1,5 +1,9 @@
-import 'package:flutter/material.dart';
 import 'dart:math' as math;
+
+import 'package:flutter/material.dart';
+
+import 'login_page.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -41,8 +45,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 2;
-  static const TextStyle optionStyle =
-  TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
+  static const TextStyle optionStyle = TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
   static late List<Widget> _pages;
 
   _MyHomePageState() {
@@ -142,13 +145,14 @@ class _MyHomePageState extends State<MyHomePage> {
     return Column(
       children: [
         Text('Favorites'),
-        Divider(thickness: 4,),
+        Divider(
+          thickness: 4,
+        ),
         Expanded(
           child: GridView.count(
             crossAxisCount: 3,
             children: List.generate(5, (index) {
-              var personColor = Color((math.Random().nextDouble() * 0xFFFFFF).toInt())
-                  .withOpacity(1.0);
+              var personColor = Color((math.Random().nextDouble() * 0xFFFFFF).toInt()).withOpacity(1.0);
               return Center(
                 child: Container(
                   width: 120,
@@ -158,8 +162,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     style: TextStyle(fontSize: 40),
                   ),
                   alignment: Alignment.center,
-                  decoration:
-                  BoxDecoration(shape: BoxShape.circle, color: personColor),
+                  decoration: BoxDecoration(shape: BoxShape.circle, color: personColor),
                 ),
               );
             }),
@@ -212,6 +215,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+
   Widget buildContactsList() {
     return ListView.builder(
       itemBuilder: (_context, index) {
@@ -223,33 +227,29 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: _pages[_selectedIndex],
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Recent',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.favorite),
-            label: 'Favorites',
-          ),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.access_time_outlined),
-              label: 'School',
-              activeIcon: Icon(Icons.access_time_filled)
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: Colors.amber[800],
-        onTap: _onItemTapped,
-      ),
+    return const Scaffold(
+      backgroundColor: Color(0xffF5f5f5),
+      // appBar: AppBar(
+      //   title: Text(widget.title),
+      // ),
+      body: const Center(child: Text('Flutter Lab')),
+      // bottomNavigationBar: BottomNavigationBar(
+      //   items: const <BottomNavigationBarItem>[
+      //     BottomNavigationBarItem(
+      //       icon: Icon(Icons.home),
+      //       label: 'Recent',
+      //     ),
+      //     BottomNavigationBarItem(
+      //       icon: Icon(Icons.favorite),
+      //       label: 'Favorites',
+      //     ),
+      //     BottomNavigationBarItem(
+      //         icon: Icon(Icons.access_time_outlined), label: 'School', activeIcon: Icon(Icons.access_time_filled)),
+      //   ],
+      //   currentIndex: _selectedIndex,
+      //   selectedItemColor: Colors.amber[800],
+      //   onTap: _onItemTapped,
+      // ),
     );
   }
 }
