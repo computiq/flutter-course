@@ -1,35 +1,39 @@
-import 'dart:math' as math;
-
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
-import 'login_page.dart';
+import 'package:flutter/painting.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
-class Contact {
+class contact {
   String image;
   String name;
-  String mobileNumber;
+  String number;
   DateTime date;
-  bool isIncoming;
+  bool IsIncoming;
 
-  Contact(this.image, this.name, this.mobileNumber, this.date, this.isIncoming);
+  contact(this.image, this.name, this.number, this.date, this.IsIncoming);
+}
+
+class post {
+  String image;
+  String likes;
+  post(this.image, this.likes);
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
+  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo 2',
+      title: 'Flutter Demo',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.purple,
       ),
-      debugShowCheckedModeBanner: false,
-      home: const MyHomePage(title: 'Contacts App'),
+      home: const MyHomePage(title: 'my first app'),
     );
   }
 }
@@ -44,135 +48,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _selectedIndex = 2;
-  static const TextStyle optionStyle = TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
-  static late List<Widget> _pages;
-
-  _MyHomePageState() {
-    _pages = [
-      buildContactsList(),
-      buildFavoritesGridView(),
-      // Text('hello'),
-      Text(
-        'Index 2: School',
-        style: optionStyle,
-      ),
-    ];
-  }
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
-  var contacts = [
-    Contact(
-      'https://i.pravatar.cc/300',
-      'Ahmed',
-      '71766137347',
-      DateTime.now().add(
-        const Duration(seconds: 3),
-      ),
-      true,
-    ),
-    Contact(
-      'https://i.pravatar.cc/301',
-      'Ali',
-      '71766137347',
-      DateTime.now().add(
-        const Duration(days: 1),
-      ),
-      false,
-    ),
-    Contact(
-      'https://i.pravatar.cc/302',
-      'Kamal',
-      '71766137347',
-      DateTime.now().add(
-        const Duration(days: 3),
-      ),
-      true,
-    ),
-    Contact(
-      'https://i.pravatar.cc/303',
-      'Mohammad',
-      '71766137347',
-      DateTime.now().add(
-        const Duration(days: 5),
-      ),
-      true,
-    ),
-    Contact(
-      'https://i.pravatar.cc/304',
-      'Mohammad',
-      '71766137347',
-      DateTime.now().add(
-        const Duration(days: 5),
-      ),
-      false,
-    ),
-    Contact(
-      'https://i.pravatar.cc/305',
-      'Hussein',
-      '71766137347',
-      DateTime.now().add(
-        const Duration(days: 6),
-      ),
-      false,
-    ),
-    Contact(
-      'https://i.pravatar.cc/306',
-      'Aboud',
-      '71766137347',
-      DateTime.now().add(
-        const Duration(days: 7),
-      ),
-      false,
-    ),
-    Contact(
-      'https://i.pravatar.cc/307',
-      'Osama',
-      '71766137347',
-      DateTime.now().add(
-        const Duration(days: 6),
-      ),
-      false,
-    ),
-  ];
-
-  Widget buildFavoritesGridView() {
-    return Column(
-      children: [
-        Text('Favorites'),
-        Divider(
-          thickness: 4,
-        ),
-        Expanded(
-          child: GridView.count(
-            crossAxisCount: 3,
-            children: List.generate(5, (index) {
-              var personColor = Color((math.Random().nextDouble() * 0xFFFFFF).toInt()).withOpacity(1.0);
-              return Center(
-                child: Container(
-                  width: 120,
-                  height: 120,
-                  child: Text(
-                    contacts[index].name[0],
-                    style: TextStyle(fontSize: 40),
-                  ),
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(shape: BoxShape.circle, color: personColor),
-                ),
-              );
-            }),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget buildContactItem(Contact _contact) {
+  Widget buildContactItem(contact _contact) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -182,24 +58,20 @@ class _MyHomePageState extends State<MyHomePage> {
               backgroundImage: NetworkImage(_contact.image),
             ),
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(17),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    _contact.name,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  Text(_contact.mobileNumber),
+                  Text(_contact.name,
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                  Text(_contact.number)
                 ],
               ),
             ),
-            Text(_contact.date.toIso8601String().split('T').first),
             Expanded(
-              child: Container(),
-            ),
-            if (_contact.isIncoming)
+                child: Text(_contact.date.toIso8601String().split('T').first)),
+            if (_contact.IsIncoming)
               Icon(
                 Icons.arrow_downward,
                 color: Colors.red,
@@ -207,7 +79,7 @@ class _MyHomePageState extends State<MyHomePage> {
             else
               Icon(
                 Icons.arrow_upward,
-                color: Colors.green,
+                color: Colors.purple,
               )
           ],
         ),
@@ -215,41 +87,86 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-
-  Widget buildContactsList() {
-    return ListView.builder(
-      itemBuilder: (_context, index) {
-        return buildContactItem(contacts[index]);
-      },
-      itemCount: contacts.length,
+  Widget buildIGcard(post _post) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Image.network("https://i.pravatar.cc/401"),
+        Row(
+          children: [
+            const Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Icon(
+                Icons.favorite_sharp,
+                color: Colors.red,
+              ),
+            ),
+            const Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Icon(Icons.location_on),
+            ),
+            Expanded(child: Container()),
+            const Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Icon(Icons.more_vert),
+            )
+          ],
+        ),
+        Text('$post.likes likes')
+      ],
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: Color(0xffF5f5f5),
-      // appBar: AppBar(
-      //   title: Text(widget.title),
-      // ),
-      body: const Center(child: Text('Flutter Lab')),
-      // bottomNavigationBar: BottomNavigationBar(
-      //   items: const <BottomNavigationBarItem>[
-      //     BottomNavigationBarItem(
-      //       icon: Icon(Icons.home),
-      //       label: 'Recent',
-      //     ),
-      //     BottomNavigationBarItem(
-      //       icon: Icon(Icons.favorite),
-      //       label: 'Favorites',
-      //     ),
-      //     BottomNavigationBarItem(
-      //         icon: Icon(Icons.access_time_outlined), label: 'School', activeIcon: Icon(Icons.access_time_filled)),
-      //   ],
-      //   currentIndex: _selectedIndex,
-      //   selectedItemColor: Colors.amber[800],
-      //   onTap: _onItemTapped,
-      // ),
-    );
+    var contacts = [
+      contact('https://i.pravatar.cc/310', 'ahmad', '07700014709',
+          DateTime.now().add(const Duration(seconds: 3)), true),
+      contact('https://i.pravatar.cc/150?u=fake@pravatar.com', 'ali',
+          '07700014764', DateTime.now().add(const Duration(seconds: 3)), false),
+      contact('https://i.pravatar.cc/305', 'abd', '07700014709',
+          DateTime.now().add(const Duration(seconds: 3)), true),
+      contact('https://i.pravatar.cc/150?u=a042581f4e29026704d', 'mhmad',
+          '07700014709', DateTime.now().add(const Duration(seconds: 3)), false),
+      contact('https://i.pravatar.cc/150?u=fake@pravatar.com', 'manhel',
+          '07700014709', DateTime.now().add(const Duration(seconds: 3)), true),
+      contact('https://i.pravatar.cc/300', 'hussen', '07700014709',
+          DateTime.now().add(const Duration(seconds: 3)), false),
+      contact('https://i.pravatar.cc/300', 'ahmad', '07700014709',
+          DateTime.now().add(const Duration(seconds: 3)), true),
+      contact('https://i.pravatar.cc/150?u=fake@pravatar.com', 'ali',
+          '07700014764', DateTime.now().add(const Duration(seconds: 3)), false),
+      contact('https://i.pravatar.cc/303', 'abd', '07700014709',
+          DateTime.now().add(const Duration(seconds: 3)), true),
+      contact('https://i.pravatar.cc/151?u=a042581f4e29026704d', 'mhmad',
+          '07700014709', DateTime.now().add(const Duration(seconds: 3)), false),
+      contact('https://i.pravatar.cc/140?u=fake@pravatar.com', 'manhel',
+          '07700014709', DateTime.now().add(const Duration(seconds: 3)), true),
+      contact('https://i.pravatar.cc/307', 'hussen', '07700014709',
+          DateTime.now().add(const Duration(seconds: 3)), false)
+    ];
+    var posts = [
+      post('https://i.pravatar.cc/407', '24324'),
+      post('https://i.pravatar.cc/406', '24324'),
+      post('https://i.pravatar.cc/404', '24324'),
+      post('https://i.pravatar.cc/405', '24324'),
+    ];
+
+    return Scaffold(
+        appBar: AppBar(
+          title: Text(widget.title),
+        ),
+        body: ListView.builder(
+          itemBuilder: (_context, index) {
+            return buildContactItem(contacts[index]);
+          },
+          itemCount: contacts.length,
+        )
+        // body: ListView.builder(itemBuilder: (_context, index) {
+        // return buildIGcard(post);
+
+        // body: SafeArea(child: buildIGcard()),
+        // }),
+        );
   }
 }
