@@ -1,6 +1,9 @@
 import 'package:contacts_01/ui/new_note_page.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import 'data.dart';
+import 'models/contact.dart';
 import 'models/note.dart';
 
 void main() {
@@ -18,7 +21,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.amber,
       ),
       debugShowCheckedModeBanner: false,
-      home: const MyHomePage(title: 'Contacts App'),
+      home: const MyHomePage(title: 'Saving/Restoring Counter'),
     );
   }
 }
@@ -35,6 +38,27 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   var notes = [];
 
+  int counter = 0;
+
+  Future<int> getSavedCounter() async {
+    var prefs = await SharedPreferences.getInstance();
+    // prefs.set
+    // counter = prefs.getInt('counter_key') ?? 0;
+    debugPrint('counter is set...');
+    counter = prefs.getInt('counter_key') ?? 0;
+
+    return counter;
+  }
+
+  @override
+  void initState() {
+    debugPrint('initState...');
+    getSavedCounter();
+    debugPrint('getSavedCounter called...');
+
+    super.initState();
+  }
+
   void removeNote(NoteModel note) {
     notes.remove(note);
     setState(() {});
@@ -43,7 +67,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget noteItemView(NoteModel note) {
     return Card(
       child: InkWell(
-        onTap: (){
+        onTap: () {
           openNewNote(noteModel: note);
         },
         child: Padding(
@@ -86,7 +110,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void openNewNote({NoteModel? noteModel}) {
-    NoteModel _note = noteModel?? NoteModel('going to shop');
+    NoteModel _note = noteModel ?? NoteModel('going to shop');
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => NewNotePage(_note)),
@@ -96,18 +120,55 @@ class _MyHomePageState extends State<MyHomePage> {
       }
       setState(() {});
     });
+  }
 
+  _incrementCounter() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    // counter = (prefs.getInt('counter_key') ?? 0) + 1;
+    debugPrint('Pressed $counter times.');
+    counter += 1;
+    await prefs.setInt('counter_key', counter);
+    debugPrint('counter: $counter');
+
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
+    debugPrint('build...');
+
+    var futureWidget = FutureBuilder<int>(
+      future: getSavedCounter(), // async work
+      builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
+        debugPrint('snapshot: ${snapshot.connectionState}');
+
+        switch (snapshot.connectionState) {
+          case ConnectionState.waiting:
+            return Container(
+              width: 100,
+              height: 100,
+              color: Colors.red,
+            );
+          default:
+            if (snapshot.hasError) {
+              return Text('Error: ${snapshot.error}');
+            } else {
+              return Text(
+                'Counter: ${snapshot.data}',
+                style: TextStyle(fontSize: 40),
+              );
+            }
+        }
+      },
+    );
+
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: buildNotesList(),
+      body: Center(child: futureWidget),
       floatingActionButton: FloatingActionButton(
-        onPressed: openNewNote,
+        onPressed: _incrementCounter,
         child: const Icon(Icons.add),
       ),
     );
