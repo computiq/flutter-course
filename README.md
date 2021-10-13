@@ -1,4 +1,6 @@
-# Flutter Course Code
+# car_renting
+
+A new Flutter project.
 
 ## Getting Started
 
