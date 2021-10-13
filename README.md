@@ -1,4 +1,6 @@
-# Flutter Course Code
+# bottom_navigation_bar
+
+A new Flutter project.
 
 ## Getting Started
 
