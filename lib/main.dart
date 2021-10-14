@@ -1,10 +1,12 @@
+import 'dart:convert';
+
 import 'package:contacts_01/ui/new_note_page.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'data.dart';
-import 'models/contact.dart';
 import 'models/note.dart';
+import 'models/user.dart';
 
 void main() {
   runApp(const MyApp());
@@ -48,6 +50,59 @@ class _MyHomePageState extends State<MyHomePage> {
     counter = prefs.getInt('counter_key') ?? 0;
 
     return counter;
+  }
+
+  Future<User> fetchUser(int id) async {
+    var url = Uri.parse('https://jsonplaceholder.typicode.com/users/$id');
+    var response = await http.get(
+      url,
+    );
+    return User.fromJson(jsonDecode(response.body));
+  }
+
+  Future<List<User>> fetchUsers() async {
+    var url = Uri.parse('https://jsonplaceholder.typicode.com/users');
+    var response = await http.get(
+      url,
+    );
+
+    var jsonUsers = jsonDecode(response.body);
+
+    List<User> users = jsonUsers.map<User>((_userJson) => User.fromJson(_userJson)).toList();
+
+    // List<User> users = [];
+    debugPrint('users.length: ${users.length}');
+
+    return users;
+  }
+
+  Widget buildUserView(User user) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(user.name),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(user.phone),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget buildUsersList(List<User> users) {
+    return ListView.builder(
+      itemBuilder: (_context, index) => buildUserView(
+        users[index],
+      ),
+      itemCount: users.length,
+    );
   }
 
   @override
@@ -137,26 +192,19 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     debugPrint('build...');
 
-    var futureWidget = FutureBuilder<int>(
-      future: getSavedCounter(), // async work
-      builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
+    var futureWidget = FutureBuilder<List<User>>(
+      future: fetchUsers(),
+      builder: (BuildContext context, AsyncSnapshot<List<User>> snapshot) {
         debugPrint('snapshot: ${snapshot.connectionState}');
 
         switch (snapshot.connectionState) {
           case ConnectionState.waiting:
-            return Container(
-              width: 100,
-              height: 100,
-              color: Colors.red,
-            );
+            return const Center(child: CircularProgressIndicator());
           default:
             if (snapshot.hasError) {
               return Text('Error: ${snapshot.error}');
             } else {
-              return Text(
-                'Counter: ${snapshot.data}',
-                style: TextStyle(fontSize: 40),
-              );
+              return buildUsersList(snapshot.data ?? []);
             }
         }
       },
