@@ -14,10 +14,11 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        iconTheme: IconThemeData(color: Color.fromARGB(40,40, 40, 1)),
-        appBarTheme: AppBarTheme(elevation: 1,
-        color: Colors.white,
-         iconTheme: IconThemeData(color: Color.fromARGB(40, 40, 40, 1))), 
+        iconTheme: IconThemeData(color: Color.fromARGB(40, 40, 40, 1)),
+        appBarTheme: AppBarTheme(
+            elevation: 1,
+            color: Colors.white,
+            iconTheme: IconThemeData(color: Color.fromARGB(40, 40, 40, 1))),
         primarySwatch: Colors.pink,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
@@ -115,4 +116,3 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
-
