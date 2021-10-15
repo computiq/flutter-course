@@ -1,9 +1,11 @@
+import 'dart:async';
 import 'dart:convert';
 
-import 'package:contacts_01/ui/new_note_page.dart';
+import 'package:contacts_01/models/error.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tuple/tuple.dart';
 
 import 'models/note.dart';
 import 'models/user.dart';
@@ -33,6 +35,7 @@ class MyHomePage extends StatefulWidget {
 
   final String title;
 
+
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
@@ -41,6 +44,12 @@ class _MyHomePageState extends State<MyHomePage> {
   var notes = [];
 
   int counter = 0;
+
+  List<User> favoriteUsers = [];
+
+  StreamController<int> streamController = StreamController();
+
+  String usersKey = 'usersKey5';
 
   Future<int> getSavedCounter() async {
     var prefs = await SharedPreferences.getInstance();
@@ -52,28 +61,54 @@ class _MyHomePageState extends State<MyHomePage> {
     return counter;
   }
 
-  Future<User> fetchUser(int id) async {
-    var url = Uri.parse('https://jsonplaceholder.typicode.com/users/$id');
-    var response = await http.get(
-      url,
-    );
-    return User.fromJson(jsonDecode(response.body));
+  Future<Tuple2<ErrorResponse?, List<User>?>> fetchUsers() async {
+    // var savedUsers = await getSavedUsers();
+    var savedUsers = null;
+
+    var response;
+    if (savedUsers == null) {
+      try {
+        var url = Uri.parse('https://jsonplaceholder.typicode.com/users');
+        debugPrint('url: ${url}');
+        response = await http.get(
+          url,
+        );
+        debugPrint('response: ${response}');
+        debugPrint('response.statusCode: ${response.statusCode}');
+        var jsonUsers = jsonDecode(response.body);
+        // jsonUsers[0]['name'] = null;
+        List<User> users = jsonUsers.map<User>((_userJson) => User.fromJson(_userJson)).toList();
+
+        debugPrint('users.length: ${users.length}');
+
+        savedUsers = users;
+        saveUsers(users);
+      } catch (e) {
+        if (response?.statusCode == 200) {
+          return Tuple2(ErrorResponse('توجد مشكلة حالياً. يرجى المحاولة فيما بعد', response?.statusCode ?? -1), null);
+        }
+        return Tuple2(ErrorResponse('يرجى التأكد من إتصالك بالإنترنت', -1), null);
+        debugPrint('e: $e');
+      }
+    }
+
+    return Tuple2(null, savedUsers);
   }
 
-  Future<List<User>> fetchUsers() async {
-    var url = Uri.parse('https://jsonplaceholder.typicode.com/users');
-    var response = await http.get(
-      url,
-    );
+  void saveUsers(List<User> users) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var usersString = jsonEncode(users);
+    debugPrint('usersString: $usersString');
+    prefs.setString(usersKey, usersString);
+  }
 
-    var jsonUsers = jsonDecode(response.body);
-
-    List<User> users = jsonUsers.map<User>((_userJson) => User.fromJson(_userJson)).toList();
-
-    // List<User> users = [];
-    debugPrint('users.length: ${users.length}');
-
-    return users;
+  Future<List<User>?> getSavedUsers() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    if (prefs.getString(usersKey) == null) {
+      return null;
+    }
+    List usersJson = jsonDecode(prefs.getString(usersKey) ?? '[]');
+    return usersJson.map<User>((_userJson) => User.fromJson(_userJson)).toList();
   }
 
   Widget buildUserView(User user) {
@@ -86,9 +121,18 @@ class _MyHomePageState extends State<MyHomePage> {
               padding: const EdgeInsets.all(8.0),
               child: Text(user.name),
             ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(user.phone),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(user.phone),
+              ),
+            ),
+            IconButton(
+              icon: Icon(Icons.add),
+              onPressed: () {
+                favoriteUsers.add(user);
+                streamController.add(favoriteUsers.length);
+              },
             ),
           ],
         ),
@@ -119,64 +163,6 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {});
   }
 
-  Widget noteItemView(NoteModel note) {
-    return Card(
-      child: InkWell(
-        onTap: () {
-          openNewNote(noteModel: note);
-        },
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Row(
-            children: [
-              Expanded(
-                child: Text(
-                  note.content,
-                  maxLines: 1,
-                  softWrap: true,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 20),
-                ),
-              ),
-              Expanded(
-                child: Container(),
-              ),
-              IconButton(
-                icon: Icon(Icons.remove_circle_outline),
-                onPressed: () => removeNote(note),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget buildNotesList() {
-    return ListView.builder(
-      itemBuilder: (_context, index) => noteItemView(notes[index]),
-      itemCount: notes.length,
-    );
-  }
-
-  void insertNewNote() {
-    notes.add(NoteModel('New note ${notes.length}'));
-    setState(() {});
-  }
-
-  void openNewNote({NoteModel? noteModel}) {
-    NoteModel _note = noteModel ?? NoteModel('going to shop');
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => NewNotePage(_note)),
-    ).then((value) {
-      if (noteModel == null) {
-        notes.add(_note);
-      }
-      setState(() {});
-    });
-  }
-
   _incrementCounter() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     // counter = (prefs.getInt('counter_key') ?? 0) + 1;
@@ -192,20 +178,39 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     debugPrint('build...');
 
-    var futureWidget = FutureBuilder<List<User>>(
+    var futureWidget = FutureBuilder<Tuple2<ErrorResponse?, List<User>?>>(
       future: fetchUsers(),
-      builder: (BuildContext context, AsyncSnapshot<List<User>> snapshot) {
+      builder: (BuildContext context, AsyncSnapshot<Tuple2<ErrorResponse?, List<User>?>> snapshot) {
         debugPrint('snapshot: ${snapshot.connectionState}');
 
         switch (snapshot.connectionState) {
           case ConnectionState.waiting:
             return const Center(child: CircularProgressIndicator());
           default:
-            if (snapshot.hasError) {
-              return Text('Error: ${snapshot.error}');
-            } else {
-              return buildUsersList(snapshot.data ?? []);
-            }
+            var response = snapshot.data;
+            if (response?.item1 == null) {
+              return buildUsersList(response?.item2 ?? []);
+            } else
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('${response?.item1?.message}'),
+                  ElevatedButton(
+                      onPressed: () {
+                        setState(() {});
+                      },
+                      child: Text('Retry'))
+                ],
+              );
+          // if (snapshot.hasError) {
+          //   // return Text('Error: ${snapshot.error}');
+          //   return Text(
+          //     'يرجى الإتصال بالإنترنت',
+          //     style: TextStyle(fontSize: 30),
+          //   );
+          // } else {
+          //   return buildUsersList(snapshot.data ?? []);
+          // }
         }
       },
     );
@@ -213,12 +218,20 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
+        actions: [
+          StreamBuilder(
+            stream: streamController.stream,
+            initialData: favoriteUsers.length,
+            builder: (_context, snapshot) {
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text('${snapshot.data}', style: TextStyle(fontSize: 20),),
+              );
+            },
+          ),
+        ],
       ),
       body: Center(child: futureWidget),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        child: const Icon(Icons.add),
-      ),
     );
   }
 }

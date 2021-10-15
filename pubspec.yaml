@@ -37,6 +37,8 @@ dependencies:
   flutter_svg: ^0.22.0
   shared_preferences: ^2.0.8
   http: ^0.13.4
+  provider: ^6.0.1
+  tuple: ^2.0.0
 
 dev_dependencies:
   flutter_test:
