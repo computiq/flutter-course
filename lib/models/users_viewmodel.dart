@@ -22,8 +22,6 @@ class UsersViewModel extends ChangeNotifier {
   }
 
   void fetchUsers() async {
-
-
     loadingState = LoadingState.loading;
     notifyListeners();
 
@@ -42,7 +40,6 @@ class UsersViewModel extends ChangeNotifier {
 
       // debugPrint('users.length: ${users.length}');
       usersResponse = Tuple2(null, users);
-      notifyListeners();
     } catch (e) {
       if (response?.statusCode == 200) {
         usersResponse = Tuple2(ErrorResponse('توجد مشكلة في عرض المعلومات', response?.statusCode), null);

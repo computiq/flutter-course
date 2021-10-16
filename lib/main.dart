@@ -104,7 +104,7 @@ class _MyHomePageState extends State<MyHomePage> {
             icon: Consumer<UsersViewModel>(
               builder: (context, favoritesViewModel, child) => Text(
                 '${favoritesViewModel.favorites.length}',
-                style: Theme.of(context).textTheme.headline4,
+                style: TextStyle(fontSize: 20),
               ),
             ),
           ),
