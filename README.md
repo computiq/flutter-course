@@ -1,4 +1,6 @@
-# Flutter Course Code
+# task_2
+
+A new Flutter application.
 
 ## Getting Started
 

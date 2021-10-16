@@ -1,119 +1,132 @@
+// ignore_for_file: must_call_super
+
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:sizer/sizer.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:task_2/ui/new_note_page.dart';
+
+import 'models/note.dart';
 
 void main() {
-  runApp(const ProviderScope(child: TabBarDemo()));
+  runApp(const MyApp());
 }
 
-class TabBarDemo extends StatelessWidget {
-  const TabBarDemo({Key? key}) : super(key: key);
+class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Sizer(builder: (BuildContext, Orientation, DeviceType) {
-      return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        home: DefaultTabController(
-          length: 3,
-          child: Scaffold(
-            backgroundColor: Colors.white,
-            bottomNavigationBar: const TabBar(
-              labelColor: Colors.blue,
-              tabs: [
-                Tab(icon: Icon(Icons.home)),
-                Tab(icon: Icon(Icons.search)),
-                Tab(icon: Icon(Icons.settings)),
-              ],
-            ),
-            appBar: AppBar(
-              title: const Text('Task week 1'),
-            ),
-            body: TabBarView(
-              children: [
-                ListView.builder(
-                  itemCount: 10,
-                  itemBuilder: (context, int index) {
-                    var imageUrl =
-                        'https://images.pexels.com/photos/1544947/pexels-photo-1544947.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=500';
+    return MaterialApp(
+      title: 'Notes App',
+      theme: ThemeData(
+        primarySwatch: Colors.amber,
+      ),
+      debugShowCheckedModeBanner: false,
+      home: const MyHomePage(title: 'notes app'),
+    );
+  }
+}
 
-                    return Center(
-                      child: Container(
-                        width: 400,
-                        // color: Color(0xff162f5a),
-                        decoration: BoxDecoration(
-                            border: Border.all(color: Colors.white, width: 6),
-                            color: const Color(0xff162f5a)),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Image.network(
-                              imageUrl,
-                              height: 30.h,
-                              width: double.maxFinite,
-                              fit: BoxFit.cover,
-                            ),
-                            Row(
-                              children: [
-                                const Padding(
-                                  padding: EdgeInsets.all(16),
-                                  child: Icon(
-                                    Icons.favorite_outline,
-                                    color: Colors.white,
-                                    size: 45,
-                                  ),
-                                ),
-                                const Padding(
-                                  padding: EdgeInsets.all(16),
-                                  child: Icon(
-                                    Icons.location_on_outlined,
-                                    color: Colors.white,
-                                    size: 45,
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Container(),
-                                ),
-                                const Padding(
-                                  padding: EdgeInsets.all(16),
-                                  child: Icon(
-                                    Icons.more_vert,
-                                    color: Colors.white,
-                                    size: 45,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: Text(
-                                '25 Likes',
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 30,
-                                    fontWeight: FontWeight.w800),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
+class MyHomePage extends StatefulWidget {
+  const MyHomePage({Key? key, required this.title}) : super(key: key);
+
+  final String title;
+
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  List<String> notes = [];
+
+  void removeNote(int index) {
+    notes.removeAt(index);
+    setState(() {});
+  }
+
+  Widget noteItemView(String note, index) {
+    return Card(
+      child: InkWell(
+        onTap: () {
+          openNewNote(noteModel: new NoteModel(note));
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  note,
+                  maxLines: 1,
+                  softWrap: true,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 20),
                 ),
-                Wrap(
-                  spacing: 8.0, // gap between adjacent chips
-                  runSpacing: 4.0, // gap between lines
-                  children: const [
-                    Card(child: Text('ali')),
-                  ],
-                ),
-                const Icon(Icons.directions_bike),
-              ],
-            ),
+              ),
+              Expanded(
+                child: Container(),
+              ),
+              IconButton(
+                icon: Icon(Icons.remove_circle_outline),
+                onPressed: () => removeNote(index),
+              ),
+            ],
           ),
         ),
-      );
+      ),
+    );
+  }
+
+  Widget buildNotesList() {
+    return ListView.builder(
+      itemBuilder: (_context, index) => noteItemView(notes[index], index),
+      itemCount: notes.length,
+    );
+  }
+
+  void insertNewNote() {
+    notes.add(NoteModel('New note ${notes.length}').content);
+    setState(() {});
+  }
+
+  void openNewNote({NoteModel? noteModel}) {
+    NoteModel _note = noteModel ?? NoteModel('');
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => NewNotePage(_note)),
+    ).then((value) async {
+      if (noteModel == null) {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        notes.add(_note.content);
+        await prefs.setStringList('notes', notes);
+      }
+      setState(() {});
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    getnotes();
+  }
+
+  void getnotes() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    notes = (prefs.getStringList('notes') ?? []);
+    setState(() {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('notes app'),
+      ),
+      body: buildNotesList(),
+      floatingActionButton: FloatingActionButton(
+        onPressed: openNewNote,
+        child: const Icon(Icons.add),
+      ),
+    );
   }
 }
