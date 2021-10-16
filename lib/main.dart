@@ -50,33 +50,39 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget buildUserView(User user) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Row(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(user.name),
-            ),
-            Expanded(
-              child: Padding(
+    return Consumer<UsersViewModel>(
+        builder: (context, favoritesViewModel, child) {
+      return Card(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(
+            children: [
+              Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Text(user.phone),
+                child: Text(user.name),
               ),
-            ),
-            IconButton(
-              icon: Icon(Icons.add),
-              onPressed: () {
-                // var favoritesViewModel = context.read<FavoritesViewModel>();
-                var favoritesViewModel = Provider.of<UsersViewModel>(context, listen: false);
-                favoritesViewModel.insert(user);
-              },
-            ),
-          ],
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(user.phone),
+                ),
+              ),
+              !favoritesViewModel.favorites.contains(user)
+                  ? IconButton(
+                      icon: Icon(Icons.add),
+                      onPressed: () {
+                        // var favoritesViewModel = context.read<FavoritesViewModel>();
+                        var favoritesViewModel =
+                            Provider.of<UsersViewModel>(context, listen: false);
+                        favoritesViewModel.insert(user);
+                      },
+                    )
+                  : Icon(Icons.done),
+            ],
+          ),
         ),
-      ),
-    );
+      );
+    });
   }
 
   Widget buildUsersListView(List<User> users) {
@@ -97,14 +103,19 @@ class _MyHomePageState extends State<MyHomePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text(
+          widget.title,
+        ),
         actions: [
           IconButton(
-            onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_context) => FavoritesPage())),
+            onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_context) => FavoritesPage())),
             icon: Consumer<UsersViewModel>(
               builder: (context, favoritesViewModel, child) => Text(
                 '${favoritesViewModel.favorites.length}',
-                style: Theme.of(context).textTheme.headline4,
+                style: TextStyle(
+                  fontSize: 12,
+                ),
               ),
             ),
           ),
@@ -113,7 +124,8 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Center(child: Consumer<UsersViewModel>(
         builder: (context, usersViewModel, child) {
           debugPrint('building users list..');
-          debugPrint('usersViewModel.loadingState: ${usersViewModel.loadingState}');
+          debugPrint(
+              'usersViewModel.loadingState: ${usersViewModel.loadingState}');
 
           if (usersViewModel.loadingState == LoadingState.loading) {
             return const Center(child: CircularProgressIndicator());
