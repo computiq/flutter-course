@@ -1,17 +1,12 @@
+// ignore_for_file: must_call_super
+
+import 'package:contacts_01/ui/new_note_page.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'models/note.dart';
 
 void main() {
   runApp(const MyApp());
-}
-
-class Contact {
-  String image;
-  String name;
-  String mobileNumber;
-  DateTime date;
-  bool isIncoming;
-
-  Contact(this.image, this.name, this.mobileNumber, this.date, this.isIncoming);
 }
 
 class MyApp extends StatelessWidget {
@@ -20,12 +15,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo 2',
+      title: 'Notes App',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.amber,
       ),
       debugShowCheckedModeBanner: false,
-      home: const MyHomePage(title: 'Contacts App'),
+      home: const MyHomePage(title: 'notes app'),
     );
   }
 }
@@ -40,246 +35,104 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  var notes = [];
+  List<String> notestobesaved = [];
 
-  int _selectedIndex = 0;
-
-  //for every button taped to navigate
-  void navigate(int index){
-    setState(() {
-      _selectedIndex = index;
-    });
+  void removeNote(NoteModel note, int index) {
+    notes.remove(note);
+    notestobesaved.removeAt(index);
+    setState(() {});
   }
 
-  //pages
-  var pages = [
-    BHomePage(),
-    Center(child: Container(alignment: Alignment.center, child: Text('Settings page test'), ),),
-  ] ;
-
-  Widget buildContactItem(Contact _contact) {
+  Widget noteItemView(NoteModel note, index) {
     return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Row(
-          children: [
-            CircleAvatar(
-              backgroundImage: NetworkImage(_contact.image),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    _contact.name,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  Text(_contact.mobileNumber),
-                ],
-              ),
-            ),
-            Text(_contact.date.toIso8601String().split('T').first),
-            Expanded(
-              child: Container(),
-            ),
-            if (_contact.isIncoming)
-              Icon(
-                Icons.arrow_downward,
-                color: Colors.red,
-              )
-            else
-              Icon(
-                Icons.arrow_upward,
-                color: Colors.green,
-              )
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget buildIGCard() {
-    var imageUrl = 'https://images.pexels.com/photos/1544947/pexels-photo-1544947.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=500';
-
-    return Container(
-      // color: Color(0xff162f5a),
-      decoration: BoxDecoration(
-          border: Border.all(color: Colors.white, width: 6),
-        color:  Color(0xff162f5a)
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Image.network(
-            imageUrl,
-            height: 300,
-            width: double.maxFinite,
-            fit: BoxFit.cover,
-          ),
-          Row(
+      child: InkWell(
+        onTap: () {
+          openNewNote(noteModel: note);
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Row(
             children: [
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Icon(
-                  Icons.favorite_outline,
-                  color: Colors.white,
-                  size: 45,
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Icon(
-                  Icons.location_on_outlined,
-                  color: Colors.white,
-                  size: 45,
+              Expanded(
+                child: Text(
+                  note.content,
+                  maxLines: 1,
+                  softWrap: true,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 20),
                 ),
               ),
               Expanded(
                 child: Container(),
               ),
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Icon(
-                  Icons.more_vert,
-                  color: Colors.white,
-                  size: 45,
-                ),
+              IconButton(
+                icon: Icon(Icons.remove_circle_outline),
+                onPressed: () => removeNote(note, index),
               ),
             ],
           ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text('25 Likes', style: TextStyle(
-              color: Colors.white, fontSize: 30,
-              fontWeight: FontWeight.w800
-            ),),
-          ),
-        ],
+        ),
       ),
     );
   }
 
+  Widget buildNotesList() {
+    return ListView.builder(
+      itemBuilder: (_context, index) => noteItemView(notes[index], index),
+      itemCount: notes.length,
+    );
+  }
+
+  void insertNewNote() {
+    notes.add(NoteModel('New note ${notes.length}'));
+    notestobesaved.add(NoteModel('New note ${notes.length}').content);
+    setState(() {});
+  }
+
+  void openNewNote({NoteModel? noteModel}) {
+    NoteModel _note = noteModel ?? NoteModel('');
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => NewNotePage(_note)),
+    ).then((value) async {
+      if (noteModel == null) {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        notestobesaved.add(_note.content);
+        notes.add(_note);
+        await prefs.setStringList('notes', notestobesaved);
+      }
+      setState(() {});
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    getnotes();
+  }
+
+  void getnotes() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    notestobesaved = (prefs.getStringList('notes') ?? []);
+    for (int i = 0; i < notestobesaved.length; i++) {
+      notes.add(NoteModel(notestobesaved[i]));
+    }
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
-    var contacts = [
-      Contact(
-        'https://i.pravatar.cc/300',
-        'Ahmed',
-        '71766137347',
-        DateTime.now().add(
-          const Duration(seconds: 3),
-        ),
-        true,
-      ),
-      Contact(
-        'https://i.pravatar.cc/301',
-        'Ali',
-        '71766137347',
-        DateTime.now().add(
-          const Duration(days: 1),
-        ),
-        false,
-      ),
-      Contact(
-        'https://i.pravatar.cc/302',
-        'Kamal',
-        '71766137347',
-        DateTime.now().add(
-          const Duration(days: 3),
-        ),
-        true,
-      ),
-      Contact(
-        'https://i.pravatar.cc/303',
-        'Mohammad',
-        '71766137347',
-        DateTime.now().add(
-          const Duration(days: 5),
-        ),
-        true,
-      ),
-      Contact(
-        'https://i.pravatar.cc/304',
-        'Mohammad',
-        '71766137347',
-        DateTime.now().add(
-          const Duration(days: 5),
-        ),
-        false,
-      ),
-      Contact(
-        'https://i.pravatar.cc/305',
-        'Hussein',
-        '71766137347',
-        DateTime.now().add(
-          const Duration(days: 6),
-        ),
-        false,
-      ),
-      Contact(
-        'https://i.pravatar.cc/306',
-        'Aboud',
-        '71766137347',
-        DateTime.now().add(
-          const Duration(days: 7),
-        ),
-        false,
-      ),
-      Contact(
-        'https://i.pravatar.cc/307',
-        'Osama',
-        '71766137347',
-        DateTime.now().add(
-          const Duration(days: 6),
-        ),
-        false,
-      ),
-    ];
-
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text('notes app'),
       ),
-      body: ListView.builder(
-        itemBuilder: (_context, index) {
-          return buildContactItem(contacts[index]);
-        },
-        itemCount: contacts.length,
+      body: buildNotesList(),
+      floatingActionButton: FloatingActionButton(
+        onPressed: openNewNote,
+        child: const Icon(Icons.add),
       ),
-        bottomNavigationBar: BottomNavigationBar(
-          currentIndex: _selectedIndex,
-          onTap: navigate,
-          backgroundColor: Colors.white,
-          items: [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'Home',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.business),
-              label: 'Business',
-            ),
-
-
-          ],
-        ),
     );
   }
 }
-
-class BHomePage extends StatefulWidget {
-  const BHomePage({Key? key}) : super(key: key);
-
-  @override
-  _BHomePageState createState() => _BHomePageState();
-}
-
-class _BHomePageState extends State<BHomePage> {
-  @override
-  Widget build(BuildContext context) {
-    return   Center(child: Container(alignment: Alignment.center, child: build(context), ),);
-  }
-}
-
