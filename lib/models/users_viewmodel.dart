@@ -21,9 +21,11 @@ class UsersViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  bool iFFav(User user) {
+    return favorites.contains(user);
+  }
+
   void fetchUsers() async {
-
-
     loadingState = LoadingState.loading;
     notifyListeners();
 
@@ -38,16 +40,21 @@ class UsersViewModel extends ChangeNotifier {
       debugPrint('response.statusCode: ${response.statusCode}');
       var jsonUsers = jsonDecode(response.body);
       // jsonUsers[0]['name'] = null;
-      var users = jsonUsers.map<User>((_userJson) => User.fromJson(_userJson)).toList();
+      var users =
+          jsonUsers.map<User>((_userJson) => User.fromJson(_userJson)).toList();
 
       // debugPrint('users.length: ${users.length}');
       usersResponse = Tuple2(null, users);
       notifyListeners();
     } catch (e) {
       if (response?.statusCode == 200) {
-        usersResponse = Tuple2(ErrorResponse('توجد مشكلة في عرض المعلومات', response?.statusCode), null);
+        usersResponse = Tuple2(
+            ErrorResponse('توجد مشكلة في عرض المعلومات', response?.statusCode),
+            null);
       } else {
-        usersResponse = Tuple2(ErrorResponse('لا يمكن الإتصال. يرجى المحاولة فيما بعد...', -1), null);
+        usersResponse = Tuple2(
+            ErrorResponse('لا يمكن الإتصال. يرجى المحاولة فيما بعد...', -1),
+            null);
       }
 
       debugPrint('e: $e');
