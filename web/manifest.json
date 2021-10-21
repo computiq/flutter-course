@@ -1,6 +1,6 @@
 {
-    "name": "contacts_01",
-    "short_name": "contacts_01",
+    "name": "test1",
+    "short_name": "test1",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
