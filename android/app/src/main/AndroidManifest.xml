@@ -1,8 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.contacts_01">
+    package="com.example.weather_application">
    <application
-        android:label="contacts_01"
-        android:icon="@mipmap/ic_launcher">
+        android:label="weather_application"
+        android:icon="@mipmap/launcher_icon">
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"

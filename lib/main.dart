@@ -1,14 +1,25 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'dart:math' as math;
+import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+import 'package:tuple/tuple.dart';
+import 'package:weather_application/ui/chose_city.dart';
+import 'package:weather_application/ui/current.dart';
+import 'package:weather_application/ui/error_ui.dart';
+import 'package:weather_application/ui/forecast.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'data_proc/current_days.dart';
+import 'data_proc/fetch_data_api.dart';
 
 void main() {
-  runApp(const MyApp());
-}
-
-class Posts {
-  String image;
-  String likes;
-  Posts(this.image, this.likes);
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setEnabledSystemUIOverlays(
+      [SystemUiOverlay.bottom, SystemUiOverlay.top]);
+  runApp(ChangeNotifierProvider(
+    create: (context) => WeatherViewModel(),
+    child: const MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
@@ -16,13 +27,21 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'bottom Navigation',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      debugShowCheckedModeBanner: false,
-      home: const MyHomePage(title: 'App'),
+    return FutureBuilder(
+      future: Init.instance.initialize(),
+      builder: (context, AsyncSnapshot snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return MaterialApp(home: Splash());
+        } else {
+          return MaterialApp(
+            title: 'Weather Application',
+            theme: ThemeData(
+              primarySwatch: Colors.blue,
+            ),
+            home: const MyHomePage(title: 'Weather '),
+          );
+        }
+      },
     );
   }
 }
@@ -36,138 +55,104 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-//////////////////////////
-
 class _MyHomePageState extends State<MyHomePage> {
-  int _selectedIndex = 2;
-  static const TextStyle optionStyle =
-      TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
-  static late List<Widget> _pages;
+  late GlobalKey<RefreshIndicatorState> refreshKey;
 
-  _MyHomePageState() {
-    _pages = [
-      buildListView(),
-      buildGridView(),
-      const Text(
-        'Other',
-        style: optionStyle,
-      ),
-    ];
-  }
+  @override
+  void initState() {
+    print('initState');
 
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
+    context.read<WeatherViewModel>().getCity();
+    context.read<WeatherViewModel>().fetchWeatherData();
+    // Future.microtask(() => context.read<WeatherViewModel>().fetchWeatherData());
 
-  var posts = [
-    Posts('https://i.pravatar.cc/300', '22'),
-    Posts('https://i.pravatar.cc/350', '232'),
-    Posts('https://i.pravatar.cc/302', '322'),
-    Posts('https://i.pravatar.cc/360', '223'),
-    Posts('https://i.pravatar.cc/300', '23'),
-    Posts('https://i.pravatar.cc/390', '324'),
-    Posts('https://i.pravatar.cc/300', '23'),
-    Posts('https://i.pravatar.cc/3340', '324'),
-    Posts('https://i.pravatar.cc/3340', '23'),
-    Posts('https://i.pravatar.cc/3490', '324'),
-  ];
-
-  var grids = [
-    Posts('https://i.pravatar.cc/300', '22'),
-    Posts('https://i.pravatar.cc/350', '232'),
-    Posts('https://i.pravatar.cc/302', '322'),
-    Posts('https://i.pravatar.cc/360', '223'),
-    Posts('https://i.pravatar.cc/300', '23'),
-    Posts('https://i.pravatar.cc/390', '324'),
-    Posts('https://i.pravatar.cc/340', '23'),
-    Posts('https://i.pravatar.cc/390', '324'),
-    Posts('https://i.pravatar.cc/500', '23'),
-    Posts('https://i.pravatar.cc/660', '324'),
-  ];
-//////////////////////////////////////////////////////////listView
-  Widget getLists(Posts _contact) {
-    return Card(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15.0),
-        ),
-        color: Colors.blue[300],
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Padding(
-              padding: EdgeInsets.all(5.0),
-              child: Image.network(_contact.image),
-            ),
-            Padding(
-                padding: EdgeInsets.all(5.0),
-                child: Row(children: [
-                  const Icon(Icons.favorite_outlined),
-                  const Icon(Icons.edit_location_alt_outlined),
-                  Expanded(child: Container()),
-                  const Icon(Icons.more_vert_outlined),
-                ])),
-            Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: Row(
-                children: [const Text('Likes: '), Text(_contact.likes)],
-              ),
-            ),
-          ],
-        ));
-  }
-
-  Widget buildListView() {
-    return ListView.builder(
-      itemBuilder: (_context, index) {
-        return getLists(posts[index]);
-      },
-      itemCount: posts.length,
-    );
-  }
-
-  //////////////////////////////////////////////////////////GridView
-
-  Widget buildGridView() {
-    return GridView.builder(
-      itemCount: grids.length,
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2, crossAxisSpacing: 4.0, mainAxisSpacing: 4.0),
-      itemBuilder: (BuildContext context, int index) {
-        return CircleAvatar(backgroundImage: NetworkImage(grids[index].image));
-      },
-    );
+    super.initState();
+    refreshKey = GlobalKey<RefreshIndicatorState>();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: _pages[_selectedIndex],
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.list),
-            label: 'ListView',
+        backgroundColor: const Color.fromRGBO(28, 46, 74, 1),
+        extendBodyBehindAppBar: false,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          title: Text(
+            widget.title,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 30,
+            ),
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.grid_3x3),
-            label: 'GridView',
-          ),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.access_time_outlined),
-              label: 'Other',
-              activeIcon: Icon(Icons.access_time_filled)),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: Colors.amber[800],
-        onTap: _onItemTapped,
-      ),
+          actions: [
+            IconButton(
+                onPressed: () async {
+                  dynamic result = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => ChoseCity(
+                            context.read<WeatherViewModel>().chosedCity)),
+                  );
+
+                  if (result != null) {
+                    setState(() {
+                      context.read<WeatherViewModel>().chosedCity = result;
+                      context.read<WeatherViewModel>().saveCity();
+                      context.read<WeatherViewModel>().fetchWeatherData();
+                    });
+                  }
+                },
+                icon: Icon(Icons.location_on))
+          ],
+        ),
+        body: RefreshIndicator(
+          key: refreshKey,
+          onRefresh: () async {
+            context.read<WeatherViewModel>().fetchWeatherData();
+          },
+          child: Center(child: Consumer<WeatherViewModel>(
+            builder: (context, weatherViewModel, child) {
+              if (weatherViewModel.loadingState == LoadingState.loading) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (weatherViewModel.WeatherResponse.item1 != null) {
+                return GetError(
+                    context, weatherViewModel.WeatherResponse.item1);
+              }
+              return SingleChildScrollView(
+                child: Column(
+                  children: [
+                    BuildCurrentCard(
+                        context, weatherViewModel.WeatherResponse.item2),
+                    BuildForeCastDays(
+                        context, weatherViewModel.WeatherResponse.item2)
+                  ],
+                ),
+              );
+            },
+          )),
+        ));
+  }
+}
+
+class Splash extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Color(0xe1f5fe).withOpacity(1.0),
+      body: Center(child: Image.asset('assets/icon_app.png')),
     );
+  }
+}
+
+class Init {
+  Init._();
+  static final instance = Init._();
+
+  Future initialize() async {
+    // This is where you can initialize the resources needed by your app while
+    // the splash screen is displayed.  Remove the following example because
+    // delaying the user experience is a bad design practice!
+    await Future.delayed(const Duration(seconds: 3));
   }
 }
