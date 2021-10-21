@@ -1,10 +1,6 @@
-// ignore_for_file: must_call_super
-
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:task_2/ui/new_note_page.dart';
-
-import 'models/note.dart';
+import 'Models/watherj.dart';
+import 'Models/weather.dart';
 
 void main() {
   runApp(const MyApp());
@@ -13,119 +9,148 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
+  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Notes App',
+      title: 'Flutter Demo',
       theme: ThemeData(
-        primarySwatch: Colors.amber,
+        primarySwatch: Colors.blue,
       ),
-      debugShowCheckedModeBanner: false,
-      home: const MyHomePage(title: 'notes app'),
+      home: MyHomePage(),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
-
-  final String title;
+  MyHomePage({Key? key}) : super(key: key);
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  List<String> notes = [];
+  DataService clint = DataService();
 
-  void removeNote(int index) {
-    notes.removeAt(index);
-    setState(() {});
-  }
+  WeatherForecast data = WeatherForecast(forecast: []);
 
-  Widget noteItemView(String note, index) {
-    return Card(
-      child: InkWell(
-        onTap: () {
-          openNewNote(noteModel: new NoteModel(note));
-        },
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Row(
-            children: [
-              Expanded(
-                child: Text(
-                  note,
-                  maxLines: 1,
-                  softWrap: true,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 20),
-                ),
-              ),
-              Expanded(
-                child: Container(),
-              ),
-              IconButton(
-                icon: Icon(Icons.remove_circle_outline),
-                onPressed: () => removeNote(index),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget buildNotesList() {
-    return ListView.builder(
-      itemBuilder: (_context, index) => noteItemView(notes[index], index),
-      itemCount: notes.length,
-    );
-  }
-
-  void insertNewNote() {
-    notes.add(NoteModel('New note ${notes.length}').content);
-    setState(() {});
-  }
-
-  void openNewNote({NoteModel? noteModel}) {
-    NoteModel _note = noteModel ?? NoteModel('');
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => NewNotePage(_note)),
-    ).then((value) async {
-      if (noteModel == null) {
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        notes.add(_note.content);
-        await prefs.setStringList('notes', notes);
-      }
-      setState(() {});
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-
-    getnotes();
-  }
-
-  void getnotes() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    notes = (prefs.getStringList('notes') ?? []);
-    setState(() {});
+  Future<WeatherForecast> getdata() async {
+    return data = await clint.getWeather('Baghdad');
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('notes app'),
-      ),
-      body: buildNotesList(),
-      floatingActionButton: FloatingActionButton(
-        onPressed: openNewNote,
-        child: const Icon(Icons.add),
+    return MaterialApp(
+      home: Scaffold(
+        appBar: AppBar(
+          title: Text('the hosiner'),
+        ),
+        body: FutureBuilder(
+          future: getdata(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.done) {
+              if (snapshot.hasData) {
+                return SingleChildScrollView(
+                  child: Center(
+                    child: Column(
+                      children: [
+                        Card(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              children: [
+                                const SizedBox(
+                                  height: 50,
+                                ),
+                                const Text('Baghdad weather for today'),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                Text('the weather is ' +
+                                    data.forecast[0].condition),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                Image.network(
+                                    'http:' + data.forecast[0].iconUrl),
+                                Text('AVG temp in C' +
+                                    data.forecast[0].avgTempC.toString()),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                Text('AVG temp in f' +
+                                    data.forecast[0].avgTempF.toString()),
+                              ],
+                            ),
+                          ),
+                        ),
+                        Card(
+                            child: Column(
+                          children: [
+                            const Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: Center(
+                                  child:
+                                      Text('The weather for the next 5 days')),
+                            ),
+                            ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: data.forecast.length,
+                                itemBuilder: (context, index) {
+                                  return Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text('Weather: ' +
+                                          data.forecast[index].condition),
+                                      const SizedBox(
+                                        width: 2,
+                                      ),
+                                      Image.network('http:' +
+                                          data.forecast[index].iconUrl),
+                                      Text('temp in C: ' +
+                                          data.forecast[index].avgTempC
+                                              .toString()),
+                                      const SizedBox(
+                                        width: 2,
+                                      ),
+                                      Text('temp in f: ' +
+                                          data.forecast[index].avgTempF
+                                              .toString()),
+                                    ],
+                                  );
+                                }),
+                          ],
+                        )),
+                      ],
+                    ),
+                  ),
+                );
+              } else if (snapshot.hasError) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        '${snapshot.error} occured pls ',
+                      ),
+                      ElevatedButton(
+                        child: Text(' try again'),
+                        onPressed: () {
+                          setState(() {
+                            getdata();
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                );
+              }
+            }
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          },
+        ),
       ),
     );
   }

@@ -1,6 +1,6 @@
 {
-    "name": "contacts_01",
-    "short_name": "contacts_01",
+    "name": "watherapp",
+    "short_name": "watherapp",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
