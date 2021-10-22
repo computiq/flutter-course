@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:waek2_task/models/todo_model.dart';
+import 'package:intl/intl.dart';
 
 class Todocard extends StatefulWidget {
   final int id;
@@ -54,13 +55,15 @@ class _TodocardState extends State<Todocard> {
               children: [
                 Text(
                   widget.title,
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, fontSize: 18),
                 ),
                 const SizedBox(
                   height: 5,
                 ),
                 Text(
-                  widget.creationDate.toString(),
+                  DateFormat('dd MMM yyyy - hh:mm aaa')
+                      .format(widget.creationDate),
                   style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
