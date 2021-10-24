@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-
-// import 'package:http/http.dart';
-// import 'widgets/main_page.dart';
 import 'widgets/get_weather.dart';
 
 void main() async {

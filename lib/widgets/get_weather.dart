@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-// import 'package:flutter_svg/flutter_svg.dart';
 import 'dart:convert';
 
 class Weather extends StatefulWidget {
@@ -27,15 +26,17 @@ class _WeatherState extends State<Weather> {
     var location = await getLocation();
     loc = location;
     String apiURL =
-        "http://api.weatherapi.com/v1/current.json?key=6d5f63266e0c4563bb622058212110&q=$location&aqi=no";
+        "http://api.weatherapi.com/v1/current.json?key=058ac018c1e747ebb0142704212410&q=$location&aqi=no";
     var weatherRes = await http.get(Uri.parse(apiURL));
     if (weatherRes.statusCode != 200) {
       return false;
     } else {
-      print(jsonDecode(weatherRes.body)['current']['temp_c']);
-      // return jsonDecode(weatherRes.body)['current']['temp_c'];
       return weatherRes.body;
     }
+  }
+
+  refresh() {
+    setState(() {});
   }
 
   @override
@@ -43,65 +44,77 @@ class _WeatherState extends State<Weather> {
     return FutureBuilder(
       future: getWeather(),
       builder: (contex, snapShot) {
-        var weatherInfo = jsonDecode(snapShot.data.toString());
-        var weatherIcon;
-        if (weatherInfo['current']['condition']['text'] == 'Partly cloudy' ||
-            weatherInfo['current']['condition']['text'] == 'Cloudy' ||
-            weatherInfo['current']['condition']['text'] == 'Overcast') {
-          weatherIcon = Icon(
-            Icons.wb_cloudy_sharp,
-            color: Colors.blueGrey[200],
-            size: 150.0,
-          );
-        } else if (weatherInfo['current']['condition']['text'] == 'Sunny') {
-          weatherIcon = Icon(
-            Icons.wb_sunny_sharp,
-            color: Colors.blueGrey[200],
-            size: 150.0,
-          );
+        if (snapShot.data == null) {
+          return const CircularProgressIndicator();
+        } else {
+          var weatherInfo = jsonDecode(snapShot.data.toString());
+          var iconFullPath =
+              weatherInfo['current']['condition']['icon'].toString().split('/');
+          var iconName = 'assets/${iconFullPath[5]}/${iconFullPath[6]}';
+          print(iconName);
+          return snapShot.connectionState == ConnectionState.waiting
+              ? const CircularProgressIndicator()
+              : Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: snapShot.connectionState == ConnectionState.waiting
+                          ? const CircularProgressIndicator()
+                          : Text(
+                              weatherInfo['location']['localtime']
+                                  .toString()
+                                  .split(' ')
+                                  .first
+                                  .toString(),
+                              style: const TextStyle(
+                                color: Colors.yellow,
+                              ),
+                            ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        'Location ${weatherInfo['location']['name']} ${weatherInfo['location']['country']}',
+                        style: const TextStyle(
+                          color: Colors.yellow,
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        "Temp In Celsius " +
+                            '${weatherInfo['current']['temp_c'].toString()} ' +
+                            "C",
+                        style: const TextStyle(
+                          color: Colors.yellow,
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        "Temp In Fahrenheit " +
+                            '${weatherInfo['current']['temp_f'].toString()} ' +
+                            "F",
+                        style: const TextStyle(
+                          color: Colors.yellow,
+                        ),
+                      ),
+                    ),
+                    Image.asset(
+                      iconName,
+                    ),
+                    FloatingActionButton(
+                      onPressed: () {
+                        setState(() {});
+                      },
+                      child: const Icon(Icons.refresh),
+                    )
+                  ],
+                );
         }
-        return snapShot.connectionState == ConnectionState.waiting
-            ? const CircularProgressIndicator()
-            : Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      'Date => ' + weatherInfo['location']['localtime'],
-                      style: const TextStyle(
-                        color: Colors.yellow,
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      'Location => ' + loc,
-                      style: const TextStyle(
-                        color: Colors.yellow,
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      "temperature in celsius => " +
-                          weatherInfo['current']['temp_c'].toString(),
-                      style: const TextStyle(
-                        color: Colors.yellow,
-                      ),
-                    ),
-                  ),
-                  // const Text(
-                  //   ":)",
-                  //   style: TextStyle(
-                  //     color: Colors.yellow,
-                  //   ),
-                  // ),
-                  weatherIcon,
-                ],
-              );
       },
     );
   }
