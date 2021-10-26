@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'home_screen.dart';
 import 'posts.dart';
 
-void main() => runApp(InstagramUiApp());
+void main() => runApp(const InstagramUiApp());
 
 class InstagramUiApp extends StatelessWidget {
   const InstagramUiApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       title: 'instagram',
       home: MyHomePage(),
     );
@@ -65,7 +65,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   static late List<Widget> _pages;
   _MyHomePageState() {
-    _pages = [
+    _pages = const [
       HomeScreen(),
       Center(
         child: Text(
@@ -91,9 +91,9 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('instagram'),
+        title: const Text('instagram'),
         actions: [
-          IconButton(onPressed: () {}, icon: Icon(Icons.message_outlined))
+          IconButton(onPressed: () {}, icon: const Icon(Icons.message_outlined))
         ],
         backgroundColor: Colors.black87,
       ),

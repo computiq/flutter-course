@@ -4,6 +4,7 @@ import 'note_model.dart';
 import 'new_note_page.dart';
 
 class NoteApp extends StatelessWidget {
+  const NoteApp({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -11,13 +12,13 @@ class NoteApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.amber,
       ),
-      home: MyHomePage(title: 'Notes App'),
+      home: const MyHomePage(title: 'Notes App'),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key? key, required this.title}) : super(key: key);
+  const MyHomePage({Key? key, required this.title}) : super(key: key);
 
   final String title;
 
@@ -35,12 +36,13 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       var notesList = prefs.getStringList('noteContent');
       if (notesList != null)
+        // ignore: curly_braces_in_flow_control_structures
         for (int i = 0; i < notesList.length; i++) {
           //here is the check for get data from SharedPreferences
           //if it is false it will execute the else statement which will remove a note
-          if (get == 'get')
+          if (get == 'get') {
             notes.add(NoteModel(notesList[i]));
-          else {
+          } else {
             notes.removeWhere((element) => element == NoteModel(notesList[i]));
           }
         }
@@ -103,13 +105,13 @@ class _MyHomePageState extends State<MyHomePage> {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   softWrap: true,
-                  style: TextStyle(fontSize: 30.0),
+                  style: const TextStyle(fontSize: 30.0),
                 ),
               ),
               Expanded(child: Container()),
               IconButton(
                   onPressed: () => removeNote(note),
-                  icon: Icon(
+                  icon: const Icon(
                     Icons.remove_circle_outline,
                     color: Colors.red,
                   )),
@@ -134,7 +136,7 @@ class _MyHomePageState extends State<MyHomePage> {
       child: Scaffold(
         appBar: AppBar(
           title: Text(widget.title),
-          bottom: TabBar(
+          bottom: const TabBar(
             tabs: [
               Tab(
                 icon: Icon(Icons.home),
@@ -147,7 +149,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
         body: TabBarView(children: [
           buildNotesList(),
-          Center(
+          const Center(
               child: Text(
             'No Favorites Yet',
             style: TextStyle(fontSize: 30.0, color: Colors.grey),

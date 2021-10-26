@@ -26,7 +26,7 @@ class HomeScreen extends StatelessWidget {
                       ),
                       Text(
                         val.userName,
-                        style: TextStyle(color: Colors.white),
+                        style: const TextStyle(color: Colors.white),
                       )
                     ],
                   ),
@@ -40,13 +40,13 @@ class HomeScreen extends StatelessWidget {
                     children: [
                       IconButton(
                         onPressed: () {},
-                        icon: Icon(Icons.favorite_outline),
+                        icon: const Icon(Icons.favorite_outline),
                         color: Colors.white,
                         iconSize: 45,
                       ),
                       IconButton(
                         onPressed: () {},
-                        icon: Icon(Icons.location_on_outlined),
+                        icon: const Icon(Icons.location_on_outlined),
                         color: Colors.white,
                         iconSize: 45,
                       ),
@@ -55,7 +55,7 @@ class HomeScreen extends StatelessWidget {
                       ),
                       IconButton(
                         onPressed: () {},
-                        icon: Icon(Icons.more_vert),
+                        icon: const Icon(Icons.more_vert),
                         color: Colors.white,
                         iconSize: 45,
                       ),
@@ -65,7 +65,7 @@ class HomeScreen extends StatelessWidget {
                     padding: const EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 16.0),
                     child: Text(
                       '${val.likes} Likes',
-                      style: TextStyle(
+                      style: const TextStyle(
                           color: Colors.white,
                           fontSize: 25,
                           fontWeight: FontWeight.w800),
