@@ -1,20 +1,16 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'dart:async';
+import 'package:google_fonts/google_fonts.dart';
+import 'Weather/fetch.dart';
 
-import 'package:path/path.dart';
-import 'package:sqflite/sqflite.dart';
-import './WeekTwoToDoList/addNewNote.dart';
-import './WeekTwoToDoList/cheked.dart';
-import './WeekTwoToDoList/dataBaseHelper/model.dart';
-import './WeekTwoToDoList/edit.dart';
 
-import 'WeekTwoToDoList/cheked.dart';
-import 'WeekTwoToDoList/dataBaseHelper/dataBaseHelper.dart';
-import './WeekTwoToDoList/dataBaseHelper/dataBaseHelper.dart';
+import 'Weather/weatherModel.dart';
 
-void main() async {
-  runApp(const MyApp());
-  WidgetsFlutterBinding.ensureInitialized();
+
+void main() {
+  runApp(
+    const MyApp(),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -23,12 +19,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
-        primarySwatch: Colors.amber,
+        primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'To Do List'),
+      home: const MyHomePage(title: 'Weather'),
     );
   }
 }
@@ -43,179 +38,159 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  late DatabaseHelper helper;
-  bool isChecked = false;
+  late Future<Weather> futureWeather;
+  TextStyle fontStyle = GoogleFonts.lato(fontSize: 16);
 
   @override
   void initState() {
     super.initState();
-    helper = DatabaseHelper();
+    futureWeather = FetchAPi().fetchPost();
   }
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 2,
+    return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: Text(widget.title),
           centerTitle: true,
-          bottom: const TabBar(
-            tabs: [
-              Icon(Icons.note),
-              Icon(Icons.check_box_outlined),
-            ],
-          ),
+          title: Text(widget.title),
+          backgroundColor: Colors.transparent,
         ),
-        body: TabBarView(children: [
-          buildDataRetriveFutureBuilder(),
-          const Checked(),
-        ]),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            Navigator.of(context).pushReplacement(
-                MaterialPageRoute(builder: (context) => const AddNote()));
-          },
-          tooltip: 'Add',
-          child: const Icon(Icons.add),
-        ),
-      ),
-    );
-  }
-
-  FutureBuilder<List<dynamic>> buildDataRetriveFutureBuilder() {
-    return FutureBuilder(
-      future: helper.allNotes(),
-      builder: (context, AsyncSnapshot snapshot) {
-        if (!snapshot.hasData) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        } else {
-          return ListView.builder(
-              itemCount: snapshot.data.length,
-              itemBuilder: (context, i) {
-                Model savedNote = Model.fromMap(snapshot.data[i]);
-
-                return Card(
-                  child: InkWell(
-                    onTap: () {
-                      Navigator.pushReplacement(context,
-                          MaterialPageRoute(builder: (context) {
-                        return EditPage(savedNote, savedNote.ID);
-                      }));
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: Row(
+        body: Center(
+            child: FutureBuilder<Weather>(
+                future: futureWeather,
+                builder: (context, AsyncSnapshot snapshot) {
+                  if (!snapshot.hasData) {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  } else if (snapshot.hasError) {
+                    return const Center(child: Text("Something Went Wrong"));
+                  } else {
+                    return Padding(
+                      padding: const EdgeInsets.all(18.0),
+                      child: Column(
                         children: [
-                          Expanded(
-                            child: Text(
-                              savedNote.content,
-                              maxLines: 1,
-                              softWrap: true,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(fontSize: 20),
+                          Column(children: [  Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(Icons.location_on_outlined),
+                                Text(
+                                  snapshot.data.cityName,
+                                  style: GoogleFonts.sourceSansPro(
+                                      fontSize: 25, fontWeight: FontWeight.bold),
+                                ),
+                                Text(
+                                  ",${snapshot.data.country}",
+                                  style: GoogleFonts.sourceSansPro(
+                                    fontSize: 25,
+                                  ),
+                                ),
+                              ],
                             ),
+                              const SizedBox(
+                                height: 50,
+                              ),
+                              Image.network(
+                                  'https://openweathermap.org/img/wn/${snapshot.data.weatherDescrip[0]["icon"]}@2x.png'),
+                              Text(
+                                "${snapshot.data.weatherDescrip[0]["main"]}",
+                                style: GoogleFonts.lato(
+                                    fontSize: 25, fontWeight: FontWeight.bold),
+                              ),
+                              Text(
+                                  "${snapshot.data.weatherDescrip[0]["description"]}"),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  " ${snapshot.data.temp.toInt()}°",
+                                  style: GoogleFonts.lato(
+                                      fontSize: 45, fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ],
+                            ),
+
+
+                          const SizedBox(
+                            height: 50,
                           ),
-                          Expanded(
-                            child: Text(savedNote.noteDate.split('T').first),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Additional Information',
+                                style: GoogleFonts.lato(
+                                    fontSize: 25, fontWeight: FontWeight.bold),
+                              )
+                            ],
                           ),
-                          IconButton(
-                            icon: const Icon(Icons.remove_circle_outline),
-                            onPressed: () {
-                              setState(() {
-
-
-                                final AlertDialog alert = AlertDialog(
-                                  title: const Text("Are you sure?"),
-                                  content: SizedBox(
-                                      height: 95,
-                                      child: Column(
-                                        children: [
-                                          const Divider(color: Colors.red),
-                                          const Text(
-                                              "Are you sure you want to delete?"),
-                                          const SizedBox(height: 10),
-                                          Row(
-                                            children: [
-                                              ElevatedButton.icon(
-                                                icon: const Icon(Icons.arrow_back_ios),
-
-                                                style: ButtonStyle(
-                                                  backgroundColor: MaterialStateProperty.all(Colors.greenAccent)
-                                                ),
-                                                label: const Text(
-                                                  "Cancel",
-                                                  style: TextStyle(color: Colors.white),
-                                                ),
-                                                onPressed: () {
-                                                  setState(() {
-                                                    Navigator.pop(context);
-                                                  });
-                                                },
-                                              ),
-                                             const Expanded(child: SizedBox()),
-                                              ElevatedButton.icon(
-                                                icon: const Icon( Icons.delete),
-                                                style: ButtonStyle(
-                                                    backgroundColor: MaterialStateProperty.all(Colors.redAccent)
-                                                ),
-                                                label: const Text(
-                                                  "Delete",
-                                                  style: TextStyle(color: Colors.white),
-                                                ),
-                                                onPressed: () {
-                                                  setState(() {
-                                                    helper.delete(savedNote.ID);
-                                                    Navigator.pushReplacement(
-                                                        context,
-                                                        MaterialPageRoute(
-                                                            builder: (context) =>const MyHomePage(title: 'To Do List')));
-                                                  });
-                                                },
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      )),
-                                );
-                                showDialog(context: context, builder: (context)=>alert);
-
-
-                              });
-                            },
+                          const SizedBox(
+                            height: 50,
                           ),
-                          Checkbox(
-                              value: isChecked,
-                              onChanged: (val) {
-                                setState(
-                                  () {
-                                    isChecked = val!;
-                                    var editNote = Model(
-                                        id: savedNote.id,
-                                        content: savedNote.content,
-                                        noteDate:
-                                            DateTime.now().toIso8601String(),
-                                        end: 'true');
-
-                                    helper.edit(editNote);
-                                    Navigator.of(context).pushReplacement(
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const MyHomePage(
-                                                    title: 'To Do List ')));
-                                  },
-                                );
-                              })
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "Feels like: ${snapshot.data.feels_like.toInt()}",
+                                    style: fontStyle,
+                                  ),
+                                  Text("Humidity: ${snapshot.data.humidity}",
+                                      style: fontStyle),
+                                ],
+                              ),
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Text("Wind speed: ${snapshot.data.wind}",
+                                      style: fontStyle),
+                                  Text("Pressure: ${snapshot.data.pressure}",
+                                      style: fontStyle),
+                                ],
+                              ),
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 25,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Column(
+                                children: [
+                                  Text('Minimum Temperature', style: fontStyle),
+                                  const SizedBox(
+                                    height: 5,
+                                  ),
+                                  Text("${snapshot.data.min_temp.toInt()}",
+                                      style: fontStyle),
+                                  Image.network(
+                                      'https://openweathermap.org/img/wn/${snapshot.data.weatherDescrip[0]["icon"]}@2x.png'),
+                                ],
+                              ),
+                              Column(
+                                children: [
+                                  Text('Minimum Temperature', style: fontStyle),
+                                  const SizedBox(
+                                    height: 5,
+                                  ),
+                                  Text("${snapshot.data.max_temp.toInt()}",
+                                      style: fontStyle),
+                                  Image.network(
+                                      'https://openweathermap.org/img/wn/${snapshot.data.weatherDescrip[0]["icon"]}@2x.png'),
+                                ],
+                              )
+                            ],
+                          ),
                         ],
                       ),
-                    ),
-                  ),
-                );
-              });
-        }
-      },
+                    );
+                  }
+                })),
+      ),
     );
   }
 }
